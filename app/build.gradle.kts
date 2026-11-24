@@ -11,8 +11,8 @@ android {
         applicationId = "com.nnazuna.nnaclicker"
         minSdk = 24
         targetSdk = 34
-        versionCode = 23
-        versionName = "2.3.0"
+        versionCode = 24
+        versionName = "2.3.1"
     }
 
     // Kunci tanda tangan tetap, supaya APK versi baru bisa langsung menimpa versi lama.
@@ -42,7 +42,8 @@ android {
         }
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("stable")
+            // Unsigned when the signing secrets are absent, so F-Droid can build and sign it.
+            if (hasStableSigning) signingConfig = signingConfigs.getByName("stable")
         }
     }
 
@@ -53,6 +54,12 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    // F-Droid: don't embed the Google-encrypted dependency metadata block in the APK.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     buildFeatures {
         aidl = true
         buildConfig = true
