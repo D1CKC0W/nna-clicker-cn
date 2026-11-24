@@ -3,6 +3,14 @@
 All notable changes to NNA Clicker are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses [Semantic Versioning](https://semver.org/).
 
+## [2.3.1] - 2026-11-24
+
+### Changed
+- Licensed under GPL-3.0.
+- Release builds without the signing secrets are left unsigned instead of failing, so F-Droid can build and sign them.
+- The APK no longer embeds Google's encrypted dependency metadata block.
+- Get it on Obtainium badge in the README.
+
 ## [2.3.0] - 2026-11-22
 
 ### Added
