@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NNA Clicker</string>
+    <string name="a11y_desc">记录你的点击和滑动并回放。仅在录制时读取触摸。屏幕仅在图像步骤时截取，图像保留在你的设备上。</string>
+</resources>
