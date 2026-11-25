@@ -107,7 +107,7 @@ class InputEngine {
             if (found == null && path != null && x != null && y != null) {
                 found = Device(path, x.first, x.second, y.first, y.second)
             }
-            if (found == null) lastErr = "Touchscreen not found"
+            if (found == null) lastErr = "未找到触摸屏"
             device = found
             found
         } catch (e: Throwable) {
@@ -134,7 +134,7 @@ class InputEngine {
         val fd: FileDescriptor = try {
             Os.open(d.path, OsConstants.O_RDONLY, 0)
         } catch (e: Throwable) {
-            lastErr = "Can't open ${d.path}: $e"
+            lastErr = "无法打开 ${d.path}: $e"
             return false
         }
         val startUs = System.currentTimeMillis() * 1000
@@ -221,7 +221,7 @@ class InputEngine {
         val rec = try {
             Recording.fromJson(JSONObject(json))
         } catch (e: Throwable) {
-            lastErr = "Invalid recording: $e"
+            lastErr = "无效录制：$e"
             return false
         }
         lastErr = ""
@@ -369,7 +369,7 @@ class InputEngine {
             p.inputStream.readBytes()
             p.waitFor()
         } catch (e: Throwable) {
-            lastErr = "Can't open $pkg: $e"
+            lastErr = "无法打开 $pkg: $e"
         }
     }
 

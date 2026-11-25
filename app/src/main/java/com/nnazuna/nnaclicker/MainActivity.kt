@@ -102,11 +102,11 @@ class MainActivity : Activity() {
 
         // ---- Kesiapan ----
         val status = k.group()
-        status.addView(statusRow("Accessibility service").also {
+        status.addView(statusRow("无障碍服务").also {
             a11yDot = it.dot; a11ySub = it.sub; a11yAction = it.action
             a11yAction.text = "›"
             a11yAction.textSize = 22f
-            a11yAction.contentDescription = "Open accessibility settings"
+            a11yAction.contentDescription = "打开无障碍设置"
             a11yAction.setOnClickListener { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
         }.view)
         status.addView(k.divider(40f))
@@ -139,7 +139,7 @@ class MainActivity : Activity() {
         status.addView(shzDiag)
         root.addView(status)
 
-        panelButton = k.pillButton("Show panel", p.ink) {
+        panelButton = k.pillButton("显示面板", p.ink) {
             val s = RecorderService.instance ?: run {
                 startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)); return@pillButton
             }
@@ -153,7 +153,7 @@ class MainActivity : Activity() {
         root.addView(quickActions())
 
         // ---- Rekaman ----
-        root.addView(k.sectionHeader("Recordings", "Import") {
+        root.addView(k.sectionHeader("录制", "导入") {
             startActivityForResult(
                 Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"),
                 REQ_IMPORT,
@@ -163,7 +163,7 @@ class MainActivity : Activity() {
         root.addView(listGroup)
 
         // ---- Pemutaran ----
-        root.addView(k.sectionHeader("Playback"))
+        root.addView(k.sectionHeader("播放"))
         val play = k.group()
 
         // Which recording these options are for.
@@ -196,7 +196,7 @@ class MainActivity : Activity() {
             setPadding(k.dp(16f), k.dp(6f), k.dp(8f), k.dp(6f))
         }
         val loopLeft = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        loopLeft.addView(k.text("Repeat", 16f, 1))
+        loopLeft.addView(k.text("重复", 16f, 1))
         loopRow.addView(loopLeft, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         loopRow.addView(stepButton("−") { cfg.loops = (cfg.loops - 1).coerceAtLeast(0); saveCfg() }.also { loopMinus = it })
         loopsValue = k.text("", 18f, 2).apply {
@@ -204,8 +204,8 @@ class MainActivity : Activity() {
             minWidth = k.dp(44f)
             fontFeatureSettings = "tnum"
             setOnClickListener {
-                Ui.numberDialog(this@MainActivity, p, "Repeat", cfg.loops.toString(), false,
-                    "0 = infinite") { v -> v.toIntOrNull()?.let { cfg.loops = it }; saveCfg() }
+                Ui.numberDialog(this@MainActivity, p, "重复", cfg.loops.toString(), false,
+                    "0 = 无限") { v -> v.toIntOrNull()?.let { cfg.loops = it }; saveCfg() }
             }
         }
         loopRow.addView(loopsValue)
@@ -218,7 +218,7 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             setPadding(k.dp(16f), k.dp(14f), k.dp(16f), k.dp(14f))
         }
-        speedRow.addView(k.text("Speed", 16f, 1))
+        speedRow.addView(k.text("速度", 16f, 1))
         speedBox = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             background = k.rounded(p.bg, 4f)
@@ -230,41 +230,41 @@ class MainActivity : Activity() {
         play.addView(speedRow)
         play.addView(k.divider())
 
-        intervalValue = addRow(play, "Delay between loops") {
-            Ui.numberDialog(this, p, "Delay between loops (seconds)", (cfg.intervalMs / 1000.0).toString(), true) { v ->
+        intervalValue = addRow(play, "循环间延时") {
+            Ui.numberDialog(this, p, "循环间延时（秒）", (cfg.intervalMs / 1000.0).toString(), true) { v ->
                 v.toDoubleOrNull()?.let { cfg.intervalMs = (it * 1000).toLong() }; saveCfg()
             }
         }
-        startValue = addRow(play, "Start delay") {
-            Ui.numberDialog(this, p, "Start delay (seconds)", (cfg.startDelayMs / 1000.0).toString(), true) { v ->
+        startValue = addRow(play, "开始延时") {
+            Ui.numberDialog(this, p, "开始延时（秒）", (cfg.startDelayMs / 1000.0).toString(), true) { v ->
                 v.toDoubleOrNull()?.let { cfg.startDelayMs = (it * 1000).toLong() }; saveCfg()
             }
         }
-        limitValue = addRow(play, "Auto stop") {
-            Ui.numberDialog(this, p, "Auto stop after (minutes)", cfg.maxMinutes.toString(), false, "0 = off") { v ->
+        limitValue = addRow(play, "自动停止") {
+            Ui.numberDialog(this, p, "几分钟后自动停止", cfg.maxMinutes.toString(), false, "0 = 关") { v ->
                 v.toIntOrNull()?.let { cfg.maxMinutes = it }; saveCfg()
             }
         }
-        jitterPxValue = addRow(play, "Randomize position") {
-            Ui.numberDialog(this, p, "Randomize position (± px)", trim(cfg.jitterPx), true, "0 = off") { v ->
+        jitterPxValue = addRow(play, "随机化位置") {
+            Ui.numberDialog(this, p, "随机化位置（± 像素）", trim(cfg.jitterPx), true, "0 = 关") { v ->
                 v.toFloatOrNull()?.let { cfg.jitterPx = it }; saveCfg()
             }
         }
-        jitterPctValue = addRow(play, "Randomize timing") {
-            Ui.numberDialog(this, p, "Randomize timing (± %)", trim(cfg.jitterPct), true, "0 = off") { v ->
+        jitterPctValue = addRow(play, "随机化时间") {
+            Ui.numberDialog(this, p, "随机化时间（± %）", trim(cfg.jitterPct), true, "0 = 关") { v ->
                 v.toFloatOrNull()?.let { cfg.jitterPct = it }; saveCfg()
             }
         }
-        val (alertRow, _) = k.switchRow("Alert when finished", storage.alertDone) { on -> storage.alertDone = on }
+        val (alertRow, _) = k.switchRow("结束时提醒", storage.alertDone) { on -> storage.alertDone = on }
         play.addView(alertRow)
         play.addView(k.divider())
-        val (dimRow, _) = k.switchRow("Dim screen while playing", storage.dimScreen) { on ->
+        val (dimRow, _) = k.switchRow("播放时屏幕变暗", storage.dimScreen) { on ->
             storage.dimScreen = on
             refreshSettings()
         }
         play.addView(dimRow)
-        k.valueRow("Dim level") {
-            Ui.numberDialog(this, p, "Dim level (%)", storage.dimLevel.toString(), false, "10–95") { v ->
+        k.valueRow("变暗级别") {
+            Ui.numberDialog(this, p, "变暗级别（%）", storage.dimLevel.toString(), false, "10–95") { v ->
                 v.toIntOrNull()?.let { storage.dimLevel = it }; refreshSettings()
             }
         }.let { (row, value) ->
@@ -276,9 +276,9 @@ class MainActivity : Activity() {
         root.addView(play)
 
         // ---- App ----
-        root.addView(k.sectionHeader("App"))
+        root.addView(k.sectionHeader("应用"))
         val app = k.group()
-        addRow(app, "Tutorial", "How to record, play, and edit", last = true) {
+        addRow(app, "教程", "如何录制、播放和编辑", last = true) {
             startActivity(Intent(this, TutorialActivity::class.java))
         }
         root.addView(app)
@@ -289,7 +289,7 @@ class MainActivity : Activity() {
             gravity = Gravity.CENTER_VERTICAL
             setPadding(k.dp(4f), k.dp(16f), k.dp(4f), k.dp(4f))
         }
-        support.addView(k.text("Support", 12f, 0, p.muted).apply {
+        support.addView(k.text("支持", 12f, 0, p.muted).apply {
             setPadding(0, 0, k.dp(6f), 0)
         })
         fun donate(label: String, url: String, last: Boolean = false) {
@@ -376,17 +376,17 @@ class MainActivity : Activity() {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
             )
         }
-        wrap.addView(k.sectionHeader("Tools"))
+        wrap.addView(k.sectionHeader("工具"))
 
         val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        row.addView(quickAction("Auto tap", Icon.TAP) { newAutoClicker() }, weighted())
-        row.addView(quickAction("Screens", Icon.IMAGE) {
-            SnapPicker.show(this, k, storage, "Screenshots", null)
+        row.addView(quickAction("自动点击", Icon.TAP) { newAutoClicker() }, weighted())
+        row.addView(quickAction("截图", Icon.IMAGE) {
+            SnapPicker.show(this, k, storage, "截图", null)
         }, weighted())
-        row.addView(quickAction("Log", Icon.CLOCK) {
+        row.addView(quickAction("日志", Icon.CLOCK) {
             startActivity(Intent(this, RunLogActivity::class.java))
         }, weighted())
-        row.addView(quickAction("Setup", Icon.SETTINGS) {
+        row.addView(quickAction("设置", Icon.SETTINGS) {
             startActivity(Intent(this, SetupActivity::class.java))
         }, weighted())
         wrap.addView(row)
@@ -430,17 +430,17 @@ class MainActivity : Activity() {
     /** Simple auto clicker: one tap or swipe repeated until stopped. */
     private fun newAutoClicker() {
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle("Auto clicker")
-            .setItems(arrayOf("Tap one spot", "Swipe", "Multi targets", "Saved setups")) { _, which ->
+            .setTitle("自动点击器")
+            .setItems(arrayOf("点击单点", "滑动", "多目标", "保存的设置")) { _, which ->
                 if (which == 2) {
                     val svc = RecorderService.instance
-                    if (svc == null) toast("Turn on accessibility service first")
+                    if (svc == null) toast("请先开启无障碍服务")
                     else svc.startMultiTarget()
                     return@setItems
                 }
                 if (which == 3) {
                     val svc = RecorderService.instance
-                    if (svc == null) toast("Turn on accessibility service first")
+                    if (svc == null) toast("请先开启无障碍服务")
                     else svc.showSavedSetups()
                     return@setItems
                 }
@@ -480,17 +480,17 @@ class MainActivity : Activity() {
         val svc = RecorderService.instance
         if (svc != null) {
             setDot(a11yDot, p.play)
-            a11ySub.text = L.t("On")
+            a11ySub.text = L.t("开")
             a11yAction.visibility = View.GONE
         } else {
             setDot(a11yDot, p.muted)
-            a11ySub.text = L.t("Off")
+            a11ySub.text = L.t("关")
             a11yAction.visibility = View.VISIBLE
         }
         panelButton.text = L.t(when {
-            svc == null -> "Turn on accessibility service"
-            svc.isPanelShown -> "Hide panel"
-            else -> "Show panel"
+            svc == null -> "开启无障碍服务"
+            svc.isPanelShown -> "隐藏面板"
+            else -> "显示面板"
         })
         panelButton.background = k.ripple(k.rounded(if (svc?.isPanelShown == true) p.muted else p.ink, 0f), 0f)
 
@@ -502,17 +502,17 @@ class MainActivity : Activity() {
         val perm = ShizukuBridge.hasPermission()
         val connected = ShizukuBridge.isConnected
         val (color, msg) = when {
-            !storage.useShizuku -> Pair(p.muted, "Off · optional, faster playback")
-            !running -> Pair(p.warn, "Shizuku not running")
-            !perm -> Pair(p.warn, "Permission needed")
-            connected -> Pair(p.play, "Connected")
-            ShizukuBridge.connecting -> Pair(p.warn, "Connecting…")
-            else -> Pair(p.rec, "Connection failed")
+            !storage.useShizuku -> Pair(p.muted, "关 · 可选，播放更快")
+            !running -> Pair(p.warn, "Shizuku 未运行")
+            !perm -> Pair(p.warn, "需要权限")
+            connected -> Pair(p.play, "已连接")
+            ShizukuBridge.connecting -> Pair(p.warn, "连接中…")
+            else -> Pair(p.rec, "连接失败")
         }
         setDot(shzDot, color)
         shzSub.text = L.t(msg)
         shzAction.visibility = if (storage.useShizuku && running && (!perm || (!connected && !ShizukuBridge.connecting))) View.VISIBLE else View.GONE
-        shzAction.text = L.t(if (!perm) "Allow" else "Retry")
+        shzAction.text = L.t(if (!perm) "允许" else "重试")
         val diag = if (storage.useShizuku) ShizukuBridge.diagnostics() else ""
         shzDiag.text = diag
         shzDiag.visibility = if (diag.isEmpty()) View.GONE else View.VISIBLE
@@ -530,11 +530,11 @@ class MainActivity : Activity() {
         scopeSwitch.isEnabled = sel != null
         scopeSwitch.alpha = if (sel != null) 1f else 0.4f
         suppressScope = false
-        scopeTitle.text = L.t("Only for this recording")
+        scopeTitle.text = L.t("仅用于此录制")
         scopeSub.text = when {
-            sel == null -> L.t("Record something first. Settings below apply to all.")
-            cfgRec != null -> L.t("Used only by “{}”", sel.name)
-            else -> L.t("Off: these settings are used by all recordings")
+            sel == null -> L.t("请先录制。下方设置对所有录制生效。")
+            cfgRec != null -> L.t("仅由 “{}” 使用", sel.name)
+            else -> L.t("关：这些设置被所有录制共用")
         }
     }
 
@@ -561,13 +561,13 @@ class MainActivity : Activity() {
         loopMinus.alpha = if (cfg.loops > 0) 1f else 0.35f
         intervalValue.text = Ui.fmtSec(cfg.intervalMs)
         startValue.text = Ui.fmtSec(cfg.startDelayMs)
-        limitValue.text = if (cfg.maxMinutes == 0) L.t("Off") else L.t("{} min", cfg.maxMinutes)
-        jitterPxValue.text = if (cfg.jitterPx == 0f) L.t("Off") else "± ${trim(cfg.jitterPx)} px"
+        limitValue.text = if (cfg.maxMinutes == 0) L.t("关") else L.t("{} min", cfg.maxMinutes)
+        jitterPxValue.text = if (cfg.jitterPx == 0f) L.t("关") else "± ${trim(cfg.jitterPx)} 像素"
         dimLevelValue.text = "${storage.dimLevel}%"
         val dimVis = if (storage.dimScreen) View.VISIBLE else View.GONE
         dimLevelRow.visibility = dimVis
         dimDivider?.visibility = dimVis
-        jitterPctValue.text = if (cfg.jitterPct == 0f) L.t("Off") else "± ${trim(cfg.jitterPct)} %"
+        jitterPctValue.text = if (cfg.jitterPct == 0f) L.t("关") else "± ${trim(cfg.jitterPct)} %"
 
         speedBox.removeAllViews()
         for (sp in SPEEDS) {
@@ -596,11 +596,11 @@ class MainActivity : Activity() {
         listKey = key
         listGroup.removeAllViews()
         if (recs.isEmpty()) {
-            listGroup.addView(k.text("No recordings yet", 16f, 1).apply {
+            listGroup.addView(k.text("暂无录制", 16f, 1).apply {
                 setPadding(k.dp(16f), k.dp(18f), k.dp(16f), 0)
             })
             listGroup.addView(k.text(
-                "Turn on the service, tap Show panel, then press the red record button in the floating panel.",
+                "开启服务，点击显示面板，然后按悬浮面板上的红色录制按钮。",
                 14f, 0, p.muted,
             ).apply { setPadding(k.dp(16f), k.dp(6f), k.dp(16f), k.dp(18f)) })
             return
@@ -628,12 +628,12 @@ class MainActivity : Activity() {
             col.addView(k.text(r.name, 16f, if (isSel) 2 else 1))
             val loops = r.flows.any { it.kind == FlowStep.GOTO }
             col.addView(k.text(
-                "${r.steps().size} steps" + (if (r.images.isNotEmpty()) " · ${r.images.size} image" else "") +
-                    (if (loops) " · repeats" else "") + (if (r.settings != null) " · own settings" else "") + "  ·  ${Ui.fmtSec(r.length)}  ·  ${fmt.format(Date(r.created))}",
+                "${r.steps().size} 个步骤" + (if (r.images.isNotEmpty()) " · ${r.images.size} 个图像" else "") +
+                    (if (loops) " · 重复" else "") + (if (r.settings != null) " · 独立设置" else "") + "  ·  ${Ui.fmtSec(r.length)}  ·  ${fmt.format(Date(r.created))}",
                 13f, 0, p.muted,
             ).apply { setPadding(0, k.dp(3f), 0, 0); fontFeatureSettings = "tnum" })
             row.addView(col, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            row.addView(k.textButton("Edit", p.play) { openEditor(r) }.apply {
+            row.addView(k.textButton("编辑", p.play) { openEditor(r) }.apply {
                 setPadding(k.dp(12f), k.dp(12f), k.dp(4f), k.dp(12f))
             })
             row.addView(k.icon(Icon.MORE, p.muted, 22f).apply {
@@ -648,12 +648,12 @@ class MainActivity : Activity() {
 
     private fun menu(anchor: View, r: Recording) {
         PopupMenu(this, anchor, Gravity.END).apply {
-            menu.add(0, 1, 0, L.t("Select"))
-            menu.add(0, 2, 1, L.t("Edit"))
-            menu.add(0, 3, 2, L.t("Rename"))
-            menu.add(0, 6, 3, L.t("Duplicate"))
-            menu.add(0, 4, 3, L.t("Export"))
-            menu.add(0, 5, 4, L.t("Delete"))
+            menu.add(0, 1, 0, L.t("选择"))
+            menu.add(0, 2, 1, L.t("编辑"))
+            menu.add(0, 3, 2, L.t("重命名"))
+            menu.add(0, 6, 3, L.t("复制"))
+            menu.add(0, 4, 3, L.t("导出"))
+            menu.add(0, 5, 4, L.t("删除"))
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     1 -> { storage.selectedId = r.id; refreshSettings(); renderList() }
@@ -679,7 +679,7 @@ class MainActivity : Activity() {
         storage.save(copy)
         storage.selectedId = copy.id
         renderList()
-        toast("Copied: ${copy.name}")
+        toast("已复制：${copy.name}")
     }
 
     private fun rename(r: Recording) {
@@ -688,21 +688,21 @@ class MainActivity : Activity() {
         }
         val box = k.frame(input, 22f, 4f)
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle("Rename")
+            .setTitle("重命名")
             .setView(box)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("保存") { _, _ ->
                 val n = input.text.toString().trim()
                 if (n.isNotEmpty()) { r.name = n; storage.save(r); renderList() }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
     private fun confirmDelete(r: Recording) {
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle("Delete \"${r.name}\"?")
-            .setPositiveButton("Delete") { _, _ -> storage.delete(r.id); renderList() }
-            .setNegativeButton("Cancel", null)
+            .setTitle("删除 "${r.name}"？")
+            .setPositiveButton("删除") { _, _ -> storage.delete(r.id); renderList() }
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -730,21 +730,21 @@ class MainActivity : Activity() {
                 REQ_EXPORT -> {
                     val r = storage.get(exportId) ?: return
                     contentResolver.openOutputStream(uri, "wt")?.use { it.write(r.toJson().toString(2).toByteArray()) }
-                    toast("Exported: ${r.name}")
+                    toast("已导出：${r.name}")
                 }
                 REQ_IMPORT -> {
                     val text = contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } ?: return
                     val r = Recording.fromJson(JSONObject(text))
-                    if (r.steps().isEmpty()) { toast("No actions in this file"); return }
+                    if (r.steps().isEmpty()) { toast("此文件无操作"); return }
                     val copy = Recording(UUID.randomUUID().toString(), r.name, System.currentTimeMillis(), r.gestures, r.images, r.flows)
                     storage.save(copy)
                     storage.selectedId = copy.id
-                    toast("Imported: ${copy.name}")
+                    toast("已导入：${copy.name}")
                     renderList()
                 }
             }
         } catch (e: Exception) {
-            toast("Couldn't read file: ${e.message}")
+            toast("无法读取文件：${e.message}")
         }
     }
 

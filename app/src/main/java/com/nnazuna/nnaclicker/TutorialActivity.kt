@@ -19,22 +19,22 @@ class TutorialActivity : Activity() {
     private class Page(val icon: Icon, val title: String, val body: String)
 
     private val pages = listOf(
-        Page(Icon.PLAY, "Welcome to NNA Clicker",
-            "NNA Clicker repeats what you do on the screen: taps, swipes, and more. This short guide shows the basics in about a minute."),
-        Page(Icon.RECORD, "1. Record",
-            "Tap Show panel, then open your game. Press the red button on the floating panel, do your taps and swipes, then press stop. The recording is saved and selected."),
-        Page(Icon.PAUSE, "2. Play, pause, stop",
-            "Press play on the panel. Use pause to take a break and continue from the same step. Press stop, or Volume Down, to end at any time. Set Repeat and Speed under Playback on the main screen."),
-        Page(Icon.LIST, "3. Edit",
-            "Tap Edit on a recording to change delays, move or delete steps, and add new ones with Add step. Use Play from here in a step's ⋮ menu to test one part."),
-        Page(Icon.CAMERA, "4. Image steps",
-            "Press the camera button while recording to add an image step. In the editor, draw a box around a button or icon. Playback can then wait for it, tap it wherever it is, or wait until it's gone."),
-        Page(Icon.JUMP, "5. Repeat and choose",
-            "Open ⋮ on a step and choose Repeat steps… to run a part several times. Image steps can choose what runs next when something is found or not, for example: tap Retry when you lose."),
-        Page(Icon.IMAGE, "6. When something goes wrong",
-            "If an image isn't found, playback stops and the screen is saved in Run log. Open it to see what was on screen and fix the step with one tap."),
-        Page(Icon.TAP, "Ready",
-            "No time to record? Use Auto clicker on the main screen to repeat a tap. You can open this guide again from Tutorial on the main screen."),
+        Page(Icon.PLAY, "欢迎使用 NNA Clicker",
+            "NNA Clicker 重复你在屏幕上的操作：点击、滑动等。这份简短指南约一分钟带你了解基础。"),
+        Page(Icon.RECORD, "1. 录制",
+            "点击显示面板，然后打开你的游戏。按悬浮面板上的红色按钮，做你的点击和滑动，然后按停止。录制会自动保存并选中。"),
+        Page(Icon.PAUSE, "2. 播放、暂停、停止",
+            "在面板上按播放。用暂停休息一下，从同一步继续。按停止或音量下键随时结束。在主界面的播放下设置重复和速度。"),
+        Page(Icon.LIST, "3. 编辑",
+            "在某条录制上点编辑可更改延时、移动或删除步骤，并用添加步骤新增。用某步骤 ⋮ 菜单里的从此处播放测试一段。"),
+        Page(Icon.CAMERA, "4. 图像步骤",
+            "录制时按相机按钮添加图像步骤。在编辑器里围绕一个按钮或图标画框。播放时即可等待它、在任意位置点击它，或等待它消失。"),
+        Page(Icon.JUMP, "5. 重复与选择",
+            "在某步骤上打开 ⋮ 并选择重复步骤… 以将一段运行多次。图像步骤可在找到或未找到时选择下一步执行什么，例如：输了时点重试。"),
+        Page(Icon.IMAGE, "6. 出错时怎么办",
+            "如果未找到图像，播放会停止，屏幕会保存到运行日志。打开它查看当时屏幕内容并一键修复步骤。"),
+        Page(Icon.TAP, "就绪",
+            "没时间录制？用主界面的自动点击器重复点击。你可以从主界面的教程重新打开本指南。"),
     )
 
     private lateinit var k: Kit
@@ -59,7 +59,7 @@ class TutorialActivity : Activity() {
             setBackgroundColor(p.bg)
         }
         val top = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.END }
-        top.addView(k.textButton("Skip", p.muted) { finish() })
+        top.addView(k.textButton("跳过", p.muted) { finish() })
         root.addView(top)
 
         val content = LinearLayout(this).apply {
@@ -89,11 +89,11 @@ class TutorialActivity : Activity() {
         })
 
         val bar = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        back = k.textButton("Back", p.play) { go(index - 1) }.apply {
+        back = k.textButton("返回", p.play) { go(index - 1) }.apply {
             setPadding(k.dp(8f), k.dp(14f), k.dp(8f), k.dp(14f))
         }
         bar.addView(back, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        next = k.pillButton("Next", p.play) { if (index < pages.size - 1) go(index + 1) else finish() }
+        next = k.pillButton("下一步", p.play) { if (index < pages.size - 1) go(index + 1) else finish() }
         bar.addView(next, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.4f))
         root.addView(bar)
 
@@ -122,7 +122,7 @@ class TutorialActivity : Activity() {
         title.text = L.t(pg.title)
         body.text = L.t(pg.body)
         back.visibility = if (i == 0) View.INVISIBLE else View.VISIBLE
-        next.text = L.t(if (i == pages.size - 1) "Start" else "Next")
+        next.text = L.t(if (i == pages.size - 1) "开始" else "下一步")
         dots.removeAllViews()
         for (d in pages.indices) {
             dots.addView(View(this).apply { background = k.rounded(if (d == i) p.play else p.line, 4f) },

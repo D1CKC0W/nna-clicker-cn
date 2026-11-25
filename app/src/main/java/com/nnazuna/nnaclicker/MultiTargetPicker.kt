@@ -49,7 +49,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
     /** Place numbered targets, then tap them in order, forever. */
     fun startMultiTap(initial: MultiSetup? = null) {
         if (svc.state != RecorderService.State.IDLE) {
-            toast("Stop recording or playback first")
+            toast("请先停止录制或播放")
             return
         }
         if (multiPicker != null) return
@@ -75,7 +75,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
 
         fun refreshTiming() {
             everyLabel.text = Ui.fmtSec(everyMs)
-            holdLabel.text = "$holdMs ms"
+            holdLabel.text = "$holdMs 毫秒"
         }
 
         fun refreshMulti() {
@@ -83,13 +83,13 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
             val selected = selectedTarget?.takeIf { multiTargets.contains(it) }
             if (selected == null) {
                 selectedTarget = null
-                countLabel.text = if (n == 0) L.t("Tap a spot") else L.t("{} targets", n)
+                countLabel.text = if (n == 0) L.t("点击一个位置") else L.t("{} targets", n)
                 delayBox.visibility = View.GONE
             } else {
-                countLabel.text = L.t("Target {}/{}", multiTargets.indexOf(selected) + 1, n)
+                countLabel.text = L.t("目标 {}/{}", multiTargets.indexOf(selected) + 1, n)
                 timingBox.visibility = View.VISIBLE
                 delayBox.visibility = View.VISIBLE
-                delayLabel.text = "${selected.delayMs} ms"
+                delayLabel.text = "${selected.delayMs} 毫秒"
             }
             startButton.isEnabled = n > 0
             startButton.alpha = if (n > 0) 1f else 0.35f
@@ -130,7 +130,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
                     if (selectedTarget == target) selectedTarget = null
                     frame.removeView(marker)
                     refreshMulti()
-                    toast("Target removed")
+                    toast("目标已移除")
                 }
             }
             marker.setOnTouchListener { _, e ->
@@ -218,14 +218,14 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
             )
             setOnClickListener { onClick() }
         }
-        row.addView(iconButton(Icon.BACK, "Undo") {
+        row.addView(iconButton(Icon.BACK, "撤销") {
             if (multiTargets.isNotEmpty()) {
                 val t = multiTargets.removeAt(multiTargets.lastIndex)
                 frame.removeView(t.view)
                 refreshMulti()
             }
         }, LinearLayout.LayoutParams(dp(36f), dp(40f)))
-        row.addView(iconButton(Icon.TRASH, "Clear") {
+        row.addView(iconButton(Icon.TRASH, "清除") {
             multiTargets.forEach { frame.removeView(it.view) }
             multiTargets.clear()
             refreshMulti()
@@ -284,12 +284,12 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
             visibility = View.GONE
             setPadding(0, dp(4f), 0, 0)
         }
-        val everyRow = timingRow("Every", { everyLabel }, {
+        val everyRow = timingRow("间隔", { everyLabel }, {
             everyMs = (everyMs - 100L).coerceAtLeast(100L); refreshTiming()
         }, {
             everyMs = (everyMs + 100L).coerceAtMost(3_600_000L); refreshTiming()
         })
-        val holdRow = timingRow("Hold", { holdLabel }, {
+        val holdRow = timingRow("按住", { holdLabel }, {
             holdMs = (holdMs - 20L).coerceAtLeast(20L); refreshTiming()
         }, {
             holdMs = (holdMs + 20L).coerceAtMost(2_000L); refreshTiming()
@@ -309,19 +309,19 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
             gravity = Gravity.CENTER
             maxLines = 1
         }
-        delayBox.addView(timingRow("Delay", { delayLabel }, {
+        delayBox.addView(timingRow("延时", { delayLabel }, {
             selectedTarget?.let { it.delayMs = (it.delayMs - 50L).coerceAtLeast(0L); refreshMulti() }
         }, {
             selectedTarget?.let { it.delayMs = (it.delayMs + 50L).coerceAtMost(10_000L); refreshMulti() }
         }))
         timingBox.addView(delayBox)
-        row.addView(iconButton(Icon.SETTINGS, "Timing") {
+        row.addView(iconButton(Icon.SETTINGS, "时间") {
             timingBox.visibility = if (timingBox.visibility == View.VISIBLE) View.GONE else View.VISIBLE
             refreshTiming()
         }, LinearLayout.LayoutParams(dp(36f), dp(40f)))
 
         startButton = TextView(svc).apply {
-            text = L.t("Start")
+            text = L.t("开始")
             gravity = Gravity.CENTER
             minHeight = dp(40f)
             setTextColor(0xFF0F1312.toInt())
@@ -334,7 +334,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
             }
             setOnClickListener {
                 if (multiTargets.isEmpty()) {
-                    toast("Add at least one target")
+                    toast("至少添加一个目标")
                 } else {
                     val points = multiTargets.map { MultiPoint(it.x, it.y, it.delayMs) }.toMutableList()
                     val id = savedId ?: UUID.randomUUID().toString()
@@ -350,7 +350,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
         row.addView(startButton, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(40f)).apply {
             leftMargin = dp(2f)
         })
-        row.addView(iconButton(Icon.CLOSE, "Cancel") { removeMultiPicker(restorePanel = true) },
+        row.addView(iconButton(Icon.CLOSE, "取消") { removeMultiPicker(restorePanel = true) },
             LinearLayout.LayoutParams(dp(36f), dp(40f)))
 
         var dragX = 0f
@@ -391,7 +391,7 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
         ))
-        toast("Tap to add · tap a marker for delay · hold to remove")
+        toast("点击添加 · 点击标记设延时 · 长按删除")
     }
 
     fun removeMultiPicker(restorePanel: Boolean) {
@@ -445,6 +445,6 @@ internal class MultiTargetPicker(svc: RecorderService) : ServiceOverlay(svc) {
         storage.save(rec)
         svc.playFrom(rec.id, -1, 1500)
         showMultiGhost(points)
-        toast("${rec.name} starts in 1.5 s. Volume Down stops.")
+        toast("${rec.name} 1.5 秒后开始。音量下键停止。")
     }
 }

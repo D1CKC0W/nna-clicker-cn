@@ -26,7 +26,7 @@ object ImageMatcher {
     /** Mean (per 4x4 cell) of the largest channel difference allowed, 0..255. */
     private const val MAX_COLOR_DIFF = 40f
 
-    /** What the search saw, for the "Test" button. */
+    /** What the search saw, for the "测试" button. */
     class Diag {
         /** Best similarity of any candidate, before the color check (-1 when nothing was compared). */
         var best = -1f

@@ -45,7 +45,7 @@ internal class QuickTapPicker(svc: RecorderService) : ServiceOverlay(svc) {
     /** One tap in the target app, then repeat it until stopped. */
     fun startQuickTap() {
         if (svc.state != RecorderService.State.IDLE) {
-            toast("Stop recording or playback first")
+            toast("请先停止录制或播放")
             return
         }
         if (picker != null) return
@@ -63,13 +63,13 @@ internal class QuickTapPicker(svc: RecorderService) : ServiceOverlay(svc) {
             }
         }
         card.addView(TextView(svc).apply {
-            text = L.t("Tap the spot to repeat")
+            text = L.t("点击要重复的位置")
             setTextColor(OverlayPalette.INK)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
             typeface = Ui.font(svc, 2)
         }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
         card.addView(TextView(svc).apply {
-            text = L.t("Cancel")
+            text = L.t("取消")
             setTextColor(COLOR_PLAY)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             typeface = Ui.font(svc, 2)
@@ -116,6 +116,6 @@ internal class QuickTapPicker(svc: RecorderService) : ServiceOverlay(svc) {
         val rec = AutoTap.quickTap(x, y, every, System.currentTimeMillis())
         storage.save(rec)
         svc.playFrom(rec.id, -1, 1500)
-        toast("Auto tap starts in 1.5 s. Volume Down stops.")
+        toast("自动点击 1.5 秒后开始。音量下键停止。")
     }
 }

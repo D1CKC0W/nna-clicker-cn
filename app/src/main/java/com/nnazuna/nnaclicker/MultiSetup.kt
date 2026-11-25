@@ -55,7 +55,7 @@ class MultiSetup(
                 }
                 MultiSetup(
                     id = id,
-                    name = o.optString("name", "Setup"),
+                    name = o.optString("name", "设置"),
                     points = points,
                     everyMs = o.optLong("every", 1000L).coerceIn(100L, 3_600_000L),
                     holdMs = o.optLong("hold", 60L).coerceIn(20L, 2_000L),

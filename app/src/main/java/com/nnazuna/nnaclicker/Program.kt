@@ -84,8 +84,8 @@ class Program(rec: Recording) {
         fun notFoundText(stepIndex: Int, st: ImageStep, best: Float): String {
             val need = (st.threshold * 100).toInt()
             val closest = (best * 100).toInt()
-            return if (best >= 0) "Image not found at step ${stepIndex + 1} (closest $closest%, needs $need%). Playback stopped."
-            else "Image not found at step ${stepIndex + 1}. Playback stopped."
+            return if (best >= 0) "步骤 ${stepIndex + 1} 未找到图像（最接近 $closest%，需要 $need%）。播放已停止。"
+            else "步骤 ${stepIndex + 1} 未找到图像。播放已停止。"
         }
 
         /** Steps that take no time; a loop of only these gets a short pause so it can't spin the CPU. */

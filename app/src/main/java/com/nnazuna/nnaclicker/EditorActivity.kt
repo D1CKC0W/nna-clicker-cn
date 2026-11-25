@@ -70,13 +70,13 @@ class EditorActivity : Activity() {
             orientation = LinearLayout.HORIZONTAL
             setPadding(k.dp(38f), 0, 0, k.dp(8f))
         }
-        actions.addView(k.textButton("Play", p.play) { playFromStart() }.apply {
+        actions.addView(k.textButton("播放", p.play) { playFromStart() }.apply {
             setPadding(k.dp(12f), k.dp(10f), k.dp(12f), k.dp(10f))
         })
-        actions.addView(k.textButton("Set all delays", p.play) { setAllGaps() }.apply {
+        actions.addView(k.textButton("设置全部延时", p.play) { setAllGaps() }.apply {
             setPadding(k.dp(12f), k.dp(10f), k.dp(12f), k.dp(10f))
         })
-        actions.addView(k.textButton("Help", p.play) { showHelp() }.apply {
+        actions.addView(k.textButton("帮助", p.play) { showHelp() }.apply {
             setPadding(k.dp(12f), k.dp(10f), k.dp(12f), k.dp(10f))
         })
         root.addView(actions)
@@ -87,7 +87,7 @@ class EditorActivity : Activity() {
         }
         root.addView(listBox)
 
-        root.addView(k.pillButton("+  Add step", p.play) { addStep(-1) }, LinearLayout.LayoutParams(
+        root.addView(k.pillButton("+  添加步骤", p.play) { addStep(-1) }, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
         ).apply { topMargin = k.dp(18f); leftMargin = k.dp(4f) })
 
@@ -223,7 +223,7 @@ class EditorActivity : Activity() {
         row.addView(View(this).apply { setBackgroundColor(p.line) },
             LinearLayout.LayoutParams(k.dp(2f), k.dp(40f)).apply { leftMargin = k.dp(17f); rightMargin = k.dp(20f) })
         val gap = gapBefore(i)
-        row.addView(k.text(if (gap <= 1) "no wait" else "wait ${FlowUi.sec(gap)}", 13f, 1, p.muted).apply {
+        row.addView(k.text(if (gap <= 1) "no wait" else "等待 ${FlowUi.sec(gap)}", 13f, 1, p.muted).apply {
             fontFeatureSettings = "tnum"
             setPadding(k.dp(10f), k.dp(3f), k.dp(10f), k.dp(3f))
             background = k.rounded(p.surface, 12f)
@@ -252,12 +252,12 @@ class EditorActivity : Activity() {
             setPadding(0, k.dp(10f), k.dp(4f), k.dp(10f))
         }
         row.addView(number(i), LinearLayout.LayoutParams(k.dp(28f), k.dp(28f)).apply { leftMargin = k.dp(4f); rightMargin = k.dp(12f) })
-        row.addView(k.icon(if (g.kind == "Swipe") Icon.SWIPE else Icon.TAP, p.ink, 22f),
+        row.addView(k.icon(if (g.kind == "滑动") Icon.SWIPE else Icon.TAP, p.ink, 22f),
             LinearLayout.LayoutParams(k.dp(28f), k.dp(28f)).apply { rightMargin = k.dp(12f) })
 
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         col.addView(k.text(g.kind, 16f, 2))
-        val where = if (g.kind == "Swipe") {
+        val where = if (g.kind == "滑动") {
             "${pts.first().x.toInt()}, ${pts.first().y.toInt()}  →  ${pts.last().x.toInt()}, ${pts.last().y.toInt()}"
         } else "${pts.first().x.toInt()}, ${pts.first().y.toInt()}"
         col.addView(k.text("at $where  ·  ${g.duration} ms", 13f, 0, p.muted).apply {
@@ -293,8 +293,8 @@ class EditorActivity : Activity() {
 
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         col.addView(k.text(s.title, 16f, 2))
-        val sub = if (!s.ready) "Tap to choose the area" else
-            (if (s.timeoutMs <= 0) "Checks once" else "Waits up to ${s.timeoutMs / 1000} s") +
+        val sub = if (!s.ready) "点击选择区域" else
+            (if (s.timeoutMs <= 0) "仅检查一次" else "最多等待 ${s.timeoutMs / 1000} 秒") +
                 "  ·  ${if (s.anywhere) "anywhere" else "near its spot"}  ·  ${(s.threshold * 100).toInt()}% match"
         col.addView(k.text(sub, 13f, if (s.ready) 0 else 1, if (s.ready) p.muted else p.warn).apply {
             setPadding(0, k.dp(3f), 0, 0)
@@ -307,10 +307,10 @@ class EditorActivity : Activity() {
         return row
     }
 
-    /** "Found → Label 1 · Not found → stop", or null when the step just continues / stops as usual. */
+    /** "找到 → 标签 1 · 未找到 → 停止", or null when the step just continues / stops as usual. */
     private fun branchText(s: ImageStep): String? {
-        val yes = if (s.action == ImageStep.ACTION_GONE) "Gone" else "Found"
-        val no = if (s.action == ImageStep.ACTION_GONE) "Still there" else "Not found"
+        val yes = if (s.action == ImageStep.ACTION_GONE) "消失" else "找到"
+        val no = if (s.action == ImageStep.ACTION_GONE) "仍在" else "未找到"
         val parts = mutableListOf<String>()
         s.foundGoto?.let { parts += "$yes → ${rec.labelName(it) ?: "?"}" }
         if (s.onTimeout == ImageStep.ON_TIMEOUT_GOTO) parts += "$no → ${rec.labelName(s.failGoto) ?: "?"}"
@@ -342,12 +342,12 @@ class EditorActivity : Activity() {
 
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val title = when (s.kind) {
-            FlowStep.LABEL -> s.name.ifEmpty { "Label" }
-            FlowStep.GOTO -> if (missing) "Go to…" else "Go to ${rec.labelName(s.ref)}"
-            FlowStep.WAIT -> "Wait"
-            FlowStep.KEY -> "Press ${FlowStep.keyName(s.ref)}"
-            FlowStep.LAUNCH -> "Open ${s.name.ifEmpty { s.ref }}"
-            else -> "Stop playback"
+            FlowStep.LABEL -> s.name.ifEmpty { "标签" }
+            FlowStep.GOTO -> if (missing) "跳转到…" else "跳转到 ${rec.labelName(s.ref)}"
+            FlowStep.WAIT -> "等待"
+            FlowStep.KEY -> "按下 ${FlowStep.keyName(s.ref)}"
+            FlowStep.LAUNCH -> "打开 ${s.name.ifEmpty { s.ref }}"
+            else -> "停止播放"
         }
         col.addView(k.text(title, 16f, 2, if (isLabel) p.play else p.ink))
         val sub = when (s.kind) {
@@ -356,21 +356,21 @@ class EditorActivity : Activity() {
                     (x is FlowStep && x.kind == FlowStep.GOTO && x.ref == s.ref) ||
                         (x is ImageStep && (x.foundGoto == s.ref || (x.onTimeout == ImageStep.ON_TIMEOUT_GOTO && x.failGoto == s.ref)))
                 }.map { it.index + 1 }
-                if (users.isEmpty()) "Label · nothing jumps here yet" else "Label · step ${users.joinToString(", ")} jump here"
+                if (users.isEmpty()) "标签 · 暂无跳转指向此处" else "Label · step ${users.joinToString(", ")} jump here"
             }
-            FlowStep.GOTO -> if (missing) "Tap to pick a label" else {
+            FlowStep.GOTO -> if (missing) "点击选择标签" else {
                 val t = labelIndex(s.ref)
                 if (t < i) {
-                    val part = if (t + 2 <= i) "steps ${t + 2}–$i" else "from step ${t + 1}"
-                    if (s.count == 0) "Repeats $part until stopped" else "Repeats $part · ${s.count + 1}× in total"
+                    val part = if (t + 2 <= i) "步骤 ${t + 2}–$i" else "从步骤 ${t + 1}"
+                    if (s.count == 0) "重复 $part 直到停止" else "重复 $part · 共 ${s.count + 1} 次"
                 } else {
-                    "Skips ahead to step ${t + 1}" + if (s.count == 0) "" else " · first ${s.count}×"
+                    "跳到步骤 ${t + 1}" + if (s.count == 0) "" else " · 前 ${s.count} 次"
                 }
             }
-            FlowStep.WAIT -> if (s.maxMs > s.minMs) "random ${FlowUi.sec(s.minMs)} – ${FlowUi.sec(s.maxMs)}" else FlowUi.sec(s.minMs)
-            FlowStep.KEY -> "System button"
-            FlowStep.LAUNCH -> "Opens the app, or brings it to the front"
-            else -> "Ends playback here"
+            FlowStep.WAIT -> if (s.maxMs > s.minMs) "随机 ${FlowUi.sec(s.minMs)} – ${FlowUi.sec(s.maxMs)}" else FlowUi.sec(s.minMs)
+            FlowStep.KEY -> "系统按键"
+            FlowStep.LAUNCH -> "打开应用，或将其带到前台"
+            else -> "在此结束播放"
         }
         col.addView(k.text(sub, 13f, if (missing) 1 else 0, if (missing) p.warn else p.muted).apply {
             setPadding(0, k.dp(3f), 0, 0)
@@ -383,18 +383,18 @@ class EditorActivity : Activity() {
 
     private fun editFlow(s: FlowStep) {
         when (s.kind) {
-            FlowStep.LABEL -> FlowUi.textDialog(this, p, "Label name", s.name) { v ->
+            FlowStep.LABEL -> FlowUi.textDialog(this, p, "标签名", s.name) { v ->
                 if (v.isNotEmpty()) { s.name = v; save() }
             }
             FlowStep.GOTO -> {
                 val target = rec.labelName(s.ref)
                 TBuilder(this, Ui.dialogTheme(p))
-                    .setTitle("Go to")
+                    .setTitle("跳转到")
                     .setItems(arrayOf(
                         "Label: ${target ?: "none"}",
-                        "Jumps: " + if (s.count == 0) "every time" else "${s.count}, then continue",
+                        "跳转：" + if (s.count == 0) "每次" else "${s.count}，然后继续",
                     )) { _, which ->
-                        if (which == 0) FlowUi.pickLabel(this, p, rec, s.ref, "Go to label") { s.ref = it; save() }
+                        if (which == 0) FlowUi.pickLabel(this, p, rec, s.ref, "跳转到标签") { s.ref = it; save() }
                         else askJumps(s) { save() }
                     }
                     .show()
@@ -407,9 +407,9 @@ class EditorActivity : Activity() {
 
     private fun askJumps(s: FlowStep, onDone: () -> Unit) =
         Ui.numberDialog(
-            this, p, "Number of jumps", s.count.toString(), false,
-            "0 = jump every time. Otherwise jump this many times, then continue with the next step. " +
-                "To repeat a part 3 times, put a label before it and jump 2 times.",
+            this, p, "跳转次数", s.count.toString(), false,
+            "0 = 每次都跳转。否则跳转此次后继续下一步。" +
+                "要将一段重复 3 次，在其前放一个标签并跳转 2 次。",
         ) { v ->
             v.toIntOrNull()?.let { s.count = it.coerceIn(0, 100_000); onDone() }
         }
@@ -424,25 +424,25 @@ class EditorActivity : Activity() {
 
     private fun stepMenu(anchor: View, i: Int) {
         PopupMenu(this, anchor, Gravity.END).apply {
-            if (steps[i] is ImageStep) menu.add(0, 4, 0, L.t("Edit image"))
+            if (steps[i] is ImageStep) menu.add(0, 4, 0, L.t("编辑图像"))
             val g = steps[i] as? RecGesture
-            if (g != null && g.strokes.size == 1) menu.add(0, 8, 0, L.t("Edit position"))
+            if (g != null && g.strokes.size == 1) menu.add(0, 8, 0, L.t("编辑位置"))
             (steps[i] as? FlowStep)?.let { f ->
                 when (f.kind) {
-                    FlowStep.LABEL -> menu.add(0, 10, 0, L.t("Rename"))
-                    FlowStep.GOTO, FlowStep.WAIT, FlowStep.KEY, FlowStep.LAUNCH -> menu.add(0, 10, 0, L.t("Edit"))
+                    FlowStep.LABEL -> menu.add(0, 10, 0, L.t("重命名"))
+                    FlowStep.GOTO, FlowStep.WAIT, FlowStep.KEY, FlowStep.LAUNCH -> menu.add(0, 10, 0, L.t("编辑"))
                     else -> {}
                 }
             }
-            menu.add(0, 9, 7, L.t("Add step after"))
-            menu.add(0, 11, 8, L.t("Play from here"))
-            menu.add(0, 12, 0, L.t("Repeat steps…"))
-            if (i > 0) menu.add(0, 5, 1, L.t("Move up"))
-            if (i < steps.size - 1) menu.add(0, 6, 2, L.t("Move down"))
-            if (steps.size > 2) menu.add(0, 7, 3, L.t("Move to…"))
-            if (i > 0) menu.add(0, 1, 4, L.t("Edit delay"))
-            menu.add(0, 2, 5, L.t("Duplicate"))
-            menu.add(0, 3, 6, L.t("Delete"))
+            menu.add(0, 9, 7, L.t("在此后添加步骤"))
+            menu.add(0, 11, 8, L.t("从此处播放"))
+            menu.add(0, 12, 0, L.t("重复步骤…"))
+            if (i > 0) menu.add(0, 5, 1, L.t("上移"))
+            if (i < steps.size - 1) menu.add(0, 6, 2, L.t("下移"))
+            if (steps.size > 2) menu.add(0, 7, 3, L.t("移动到…"))
+            if (i > 0) menu.add(0, 1, 4, L.t("编辑延时"))
+            menu.add(0, 2, 5, L.t("复制"))
+            menu.add(0, 3, 6, L.t("删除"))
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     1 -> askGap(i)
@@ -456,7 +456,7 @@ class EditorActivity : Activity() {
                     9 -> addStep(i)
                     5 -> move(i, i - 1)
                     6 -> move(i, i + 1)
-                    7 -> Ui.numberDialog(this@EditorActivity, p, "Move step ${i + 1} to", "${i + 1}", false, "1–${steps.size}") { v ->
+                    7 -> Ui.numberDialog(this@EditorActivity, p, "将步骤 ${i + 1} 移动到", "${i + 1}", false, "1–${steps.size}") { v ->
                         v.toIntOrNull()?.let { n -> move(i, (n - 1).coerceIn(0, steps.size - 1)) }
                     }
                 }
@@ -467,12 +467,12 @@ class EditorActivity : Activity() {
     }
 
     private fun askGap(i: Int) =
-        Ui.numberDialog(this, p, "Delay before step ${i + 1} (ms)", gapBefore(i).toString(), false) { v ->
+        Ui.numberDialog(this, p, "步骤 ${i + 1} 前的延时（毫秒）", gapBefore(i).toString(), false) { v ->
             v.toLongOrNull()?.let { setGap(i, it); save() }
         }
 
     private fun setAllGaps() =
-        Ui.numberDialog(this, p, "Set all delays (ms)", "500", false) { v ->
+        Ui.numberDialog(this, p, "设置全部延时（毫秒）", "500", false) { v ->
             v.toLongOrNull()?.let { ms ->
                 for (i in 1 until steps.size) setGap(i, ms)
                 save()
@@ -497,7 +497,7 @@ class EditorActivity : Activity() {
     private fun delete(i: Int) {
         if (steps.size <= 1) {
             TBuilder(this, Ui.dialogTheme(p))
-                .setMessage("A recording needs at least one step.")
+                .setMessage("录制至少需要一个步骤。")
                 .setPositiveButton("OK", null).show()
             return
         }
@@ -510,10 +510,10 @@ class EditorActivity : Activity() {
                         rec.images.count { it.foundGoto == s.ref || it.failGoto == s.ref }
                     if (users > 0) {
                         TBuilder(this, Ui.dialogTheme(p))
-                            .setTitle("Delete ${s.name}?")
-                            .setMessage("$users step(s) jump to this label. Image steps will continue with the next step instead, and Go to steps will need a new label.")
-                            .setPositiveButton("Delete") { _, _ -> deleteLabel(s) }
-                            .setNegativeButton("Cancel", null)
+                            .setTitle("删除 ${s.name}？")
+                            .setMessage("$users 个步骤跳转到此标签。图像步骤将改为继续下一步，跳转步骤需要新标签。")
+                            .setPositiveButton("删除") { _, _ -> deleteLabel(s) }
+                            .setNegativeButton("取消", null)
                             .show()
                         return
                     }
@@ -542,7 +542,7 @@ class EditorActivity : Activity() {
         val afterEnd = anchor?.let { it.at + it.duration } ?: -1L
         val afterStart = anchor?.at ?: -1L
         val index = if (after < 0) steps.size else after + 1
-        stepSheet(if (anchor == null) "Add step" else "Add step after ${after + 1}") { which ->
+        stepSheet(if (anchor == null) "添加步骤" else "在步骤 ${after + 1} 后添加") { which ->
                 when (which) {
                     0, 1 -> startActivity(
                         Intent(this, PointActivity::class.java)
@@ -557,12 +557,12 @@ class EditorActivity : Activity() {
                     }
                     4 -> {
                         val st = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = FlowUi.newLabelName(rec))
-                        FlowUi.textDialog(this, p, "Label name", st.name) { v ->
+                        FlowUi.textDialog(this, p, "标签名", st.name) { v ->
                             if (v.isNotEmpty()) st.name = v
                             insertAt(index, st, 0)
                         }
                     }
-                    5 -> FlowUi.pickLabel(this, p, rec, null, "Go to label") { ref ->
+                    5 -> FlowUi.pickLabel(this, p, rec, null, "跳转到标签") { ref ->
                         val st = FlowStep(0, FlowStep.GOTO, ref = ref)
                         askJumps(st) { insertAt(index, st, 0) }
                     }
@@ -576,26 +576,26 @@ class EditorActivity : Activity() {
         }
     }
 
-    /** Choices for "Add step", grouped and explained, with the ids used by [addStep]. */
+    /** Choices for "添加步骤", grouped and explained, with the ids used by [addStep]. */
     private fun stepSheet(title: String, onPick: (Int) -> Unit) {
         val groups = listOf(
-            "Touch" to listOf(
-                Triple(0, "Tap", "Tap one spot"),
-                Triple(1, "Swipe", "Drag from one point to another"),
+            "触摸" to listOf(
+                Triple(0, "点击", "点击单点"),
+                Triple(1, "滑动", "从一点拖到另一点"),
             ),
-            "Image" to listOf(
-                Triple(2, "Image", "Wait for, or tap, something on the screen"),
+            "图像" to listOf(
+                Triple(2, "图像", "等待或点击屏幕上的内容"),
             ),
-            "Repeat and logic" to listOfNotNull(
-                Triple(9, "Repeat steps", "Run some steps several times").takeIf { steps.isNotEmpty() },
-                Triple(3, "Wait", "Pause for a fixed or random time"),
-                Triple(4, "Label", "A place other steps can jump to"),
-                Triple(5, "Go to label", "Jump to a label"),
-                Triple(8, "Stop playback", "End playback here"),
+            "重复与逻辑" to listOfNotNull(
+                Triple(9, "重复步骤", "将某些步骤运行多次").takeIf { steps.isNotEmpty() },
+                Triple(3, "等待", "暂停固定或随机时长"),
+                Triple(4, "标签", "其他步骤可跳转到的位置"),
+                Triple(5, "跳转到标签", "跳转到标签"),
+                Triple(8, "停止播放", "在此结束播放"),
             ),
-            "System" to listOf(
-                Triple(6, "Back / Home / Recent apps", "Press a system button"),
-                Triple(7, "Open app", "Open or switch to an app"),
+            "系统" to listOf(
+                Triple(6, "返回 / 主屏 / 最近应用", "按下系统按键"),
+                Triple(7, "打开应用", "打开或切换到应用"),
             ),
         )
         val icons = mapOf(0 to Icon.TAP, 1 to Icon.SWIPE, 2 to Icon.IMAGE, 9 to Icon.JUMP, 3 to Icon.CLOCK,
@@ -631,7 +631,7 @@ class EditorActivity : Activity() {
         dialog = TBuilder(this, Ui.dialogTheme(p))
             .setTitle(title)
             .setView(ScrollView(this).apply { addView(box) })
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -643,9 +643,9 @@ class EditorActivity : Activity() {
         if (steps.isEmpty()) return
         val first = at.coerceIn(0, steps.size - 1) + 1
         FlowUi.numbersDialog(
-            this, p, "Repeat steps",
-            "The steps from the first to the last number run this many times. 0 = until you stop playback.",
-            listOf("From step" to "$first", "To step" to "$first", "Times" to "3"), false,
+            this, p, "重复步骤",
+            "从第一个到最后一个步骤号运行此次数。0 = 直到停止播放。",
+            listOf("从步骤" to "$first", "到步骤" to "$first", "次数" to "3"), false,
         ) { v ->
             val a = v[0].toIntOrNull() ?: return@numbersDialog
             val b = v[1].toIntOrNull() ?: a
@@ -653,13 +653,13 @@ class EditorActivity : Activity() {
             val from = (minOf(a, b) - 1).coerceIn(0, steps.size - 1)
             val to = (maxOf(a, b) - 1).coerceIn(0, steps.size - 1)
             if (times == 1) return@numbersDialog
-            val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = FlowUi.newLabelName(rec, "Repeat"))
+            val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = FlowUi.newLabelName(rec, "重复"))
             val jump = FlowStep(0, FlowStep.GOTO, ref = label.ref, count = if (times <= 0) 0 else times - 1)
             // Add the jump first so the step numbers for the label stay the same.
             insertAt(to + 1, jump, 0)
             insertAt(from, label, 0)
             LToast.makeText(this,
-                if (times <= 0) "Steps ${from + 1}–${to + 1} repeat until stopped" else "Steps ${from + 1}–${to + 1} run $times times",
+                if (times <= 0) "步骤 ${from + 1}–${to + 1} 重复直到停止" else "步骤 ${from + 1}–${to + 1} 运行 $times 次",
                 android.widget.Toast.LENGTH_SHORT).show()
         }
     }
@@ -667,24 +667,32 @@ class EditorActivity : Activity() {
     private fun playFromStart() {
         val svc = RecorderService.instance
         if (svc == null) {
-            LToast.makeText(this, "Turn on the accessibility service first", android.widget.Toast.LENGTH_SHORT).show()
+            LToast.makeText(this, "请先开启无障碍服务", android.widget.Toast.LENGTH_SHORT).show()
             return
         }
-        LToast.makeText(this, "Open the game. Playing in 3 seconds…", android.widget.Toast.LENGTH_LONG).show()
+        LToast.makeText(this, "打开游戏。3 秒后开始播放…", android.widget.Toast.LENGTH_LONG).show()
         svc.playFrom(rec.id, -1)
         moveTaskToBack(true)
     }
 
     private fun showHelp() {
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle("How steps work")
+            .setTitle("步骤如何运作")
             .setMessage(
-                "Steps run from top to bottom. Tap a \"wait\" between steps to change the delay.\n\n" +
-                    "Repeat steps: open ⋮ on a step and choose Repeat steps… to run a part several times.\n\n" +
-                    "Label + Go to: a Label marks a place, and Go to jumps to it. Jumping back repeats the steps in between; " +
-                    "the colored bar on the left shows which steps repeat.\n\n" +
-                    "Image steps can choose what runs next: under If found and If not found, pick the next step, a label, or stop.\n\n" +
-                    "Volume Down stops playback at any time."
+                "步骤从上到下运行。点击步骤之间的等待可更改延时。
+
+" +
+                    "重复步骤：在某个步骤上打开 ⋮ 并选择重复步骤… 以将一段运行多次。
+
+" +
+                    "标签 + 跳转：标签标记一个位置，跳转跳到该处。往回跳转会重复中间的步骤；" +
+                    "左侧的彩色条表示哪些步骤在重复。
+
+" +
+                    "图像步骤可选择下一步执行什么：在如果找到和如果未找到下，选择下一步、一个标签或停止。
+
+" +
+                    "音量下键可随时停止播放。"
             )
             .setPositiveButton("OK", null)
             .show()
@@ -694,10 +702,10 @@ class EditorActivity : Activity() {
     private fun playFrom(i: Int) {
         val svc = RecorderService.instance
         if (svc == null) {
-            LToast.makeText(this, "Turn on the accessibility service first", android.widget.Toast.LENGTH_SHORT).show()
+            LToast.makeText(this, "请先开启无障碍服务", android.widget.Toast.LENGTH_SHORT).show()
             return
         }
-        LToast.makeText(this, "Open the game. Playing from step ${i + 1} in 3 seconds…", android.widget.Toast.LENGTH_LONG).show()
+        LToast.makeText(this, "打开游戏。3 秒后从步骤 ${i + 1} 开始播放…", android.widget.Toast.LENGTH_LONG).show()
         svc.playFrom(rec.id, steps[i].at)
         moveTaskToBack(true)
     }
@@ -712,7 +720,7 @@ class EditorActivity : Activity() {
 
     /** Add an image step from a saved screenshot, then open it to choose the area. */
     private fun addImageStep(afterEnd: Long, afterStart: Long) {
-        SnapPicker.show(this, k, storage, "Add image step from") { file ->
+        SnapPicker.show(this, k, storage, "从此添加图像步骤") { file ->
             val gap = PointActivity.GAP
             val at = if (afterEnd >= 0) {
                 steps.filter { it.at > afterEnd || (it.at == afterEnd && it.at > afterStart) }.forEach { it.at += gap }

@@ -50,7 +50,7 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
     @SuppressLint("ClickableViewAccessibility")
     fun showSetupList() {
         if (storage.setups().isEmpty()) {
-            toast("No saved setups yet. Press Start once to save one.")
+            toast("暂无保存的设置。按一次开始即可保存一个。")
             return
         }
         closeSetupList()
@@ -135,7 +135,7 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
             val setups = storage.setups()
             if (setups.isEmpty()) {
                 closeSetupList()
-                toast("All setups deleted")
+                toast("所有设置已删除")
                 return@render
             }
             setups.forEachIndexed { index, s ->
@@ -196,7 +196,7 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
                             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,
                         ))
                         card.addView(info, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-                        card.addView(iconButton(Icon.CHECK, "Save name", OverlayPalette.ON_ACCENT, COLOR_PLAY) { commit() },
+                        card.addView(iconButton(Icon.CHECK, "保存名称", OverlayPalette.ON_ACCENT, COLOR_PLAY) { commit() },
                             LinearLayout.LayoutParams(dp(36f), dp(36f)).apply { leftMargin = dp(8f) })
                         input.post {
                             input.requestFocus()
@@ -205,12 +205,12 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
                         }
                     }
                     danger -> {
-                        info.addView(text("Delete \"${s.name}\"?", 14f, ink, 2))
-                        info.addView(text("This can't be undone", 12f, 0xFFF2A0A6.toInt(), 0))
+                        info.addView(text("删除 "${s.name}"？", 14f, ink, 2))
+                        info.addView(text("此操作无法撤销", 12f, 0xFFF2A0A6.toInt(), 0))
                         card.addView(info, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-                        card.addView(pill("Keep", ink, 0x22FFFFFF) { confirmId = null; render() },
+                        card.addView(pill("保留", ink, 0x22FFFFFF) { confirmId = null; render() },
                             LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(36f)).apply { rightMargin = dp(6f) })
-                        card.addView(pill("Delete", 0xFFFFFFFF.toInt(), COLOR_REC) {
+                        card.addView(pill("删除", 0xFFFFFFFF.toInt(), COLOR_REC) {
                             storage.deleteSetup(s.id)
                             confirmId = null
                             render()
@@ -218,20 +218,20 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
                     }
                     else -> {
                         info.addView(text(s.name, 15f, ink, 2))
-                        info.addView(text("Every ${FlowUi.sec(s.everyMs)} · hold ${s.holdMs} ms", 12f, muted, 0)
+                        info.addView(text("每 ${FlowUi.sec(s.everyMs)} · 按住 ${s.holdMs} 毫秒", 12f, muted, 0)
                             .apply { setPadding(0, dp(2f), 0, 0) })
                         card.addView(info, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-                        card.addView(iconButton(Icon.EDIT, "Rename ${s.name}", muted, 0x00000000) {
+                        card.addView(iconButton(Icon.EDIT, "重命名 ${s.name}", muted, 0x00000000) {
                             editingId = s.id; confirmId = null
                             setFocusable(true)
                             render()
                         }, LinearLayout.LayoutParams(dp(36f), dp(36f)))
-                        card.addView(iconButton(Icon.TRASH, "Delete ${s.name}", muted, 0x00000000) {
+                        card.addView(iconButton(Icon.TRASH, "删除 ${s.name}", muted, 0x00000000) {
                             confirmId = s.id; editingId = null
                             setFocusable(false)
                             render()
                         }, LinearLayout.LayoutParams(dp(36f), dp(36f)).apply { rightMargin = dp(4f) })
-                        card.addView(iconButton(Icon.PLAY, "Open ${s.name}", OverlayPalette.ON_ACCENT, COLOR_PLAY) {
+                        card.addView(iconButton(Icon.PLAY, "打开 ${s.name}", OverlayPalette.ON_ACCENT, COLOR_PLAY) {
                             closeSetupList()
                             svc.multiTap.startMultiTap(s)
                         }, LinearLayout.LayoutParams(dp(40f), dp(40f)))
@@ -251,17 +251,17 @@ internal class SetupListOverlay(svc: RecorderService) : ServiceOverlay(svc) {
             setPadding(dp(4f), 0, 0, dp(10f))
         }
         val titles = LinearLayout(svc).apply { orientation = LinearLayout.VERTICAL }
-        titles.addView(text("SAVED SETUPS", 18f, ink, 3).apply { letterSpacing = 0.04f })
-        titles.addView(text("Tap to open · edit or delete with the icons", 12f, muted, 0))
+        titles.addView(text("保存的设置", 18f, ink, 3).apply { letterSpacing = 0.04f })
+        titles.addView(text("点击打开 · 用图标编辑或删除", 12f, muted, 0))
         header.addView(titles, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-        header.addView(iconButton(Icon.CLOSE, "Close", ink, 0x22FFFFFF) { closeSetupList() },
+        header.addView(iconButton(Icon.CLOSE, "关闭", ink, 0x22FFFFFF) { closeSetupList() },
             LinearLayout.LayoutParams(dp(36f), dp(36f)))
         box.addView(header)
         box.addView(scroll, LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,
         ))
         // New setup shortcut
-        box.addView(pill("+  New setup", COLOR_PLAY, 0x1F5FD3BC) { closeSetupList(); svc.multiTap.startMultiTap() },
+        box.addView(pill("+  新建设置", COLOR_PLAY, 0x1F5FD3BC) { closeSetupList(); svc.multiTap.startMultiTap() },
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(42f)).apply { topMargin = dp(10f) })
 
         render()

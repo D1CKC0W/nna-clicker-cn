@@ -16,7 +16,7 @@ object AutoTap {
     fun quickTap(x: Float, y: Float, everyMs: Long, now: Long, holdMs: Long = 60L): Recording {
         val every = everyMs.coerceIn(MIN_EVERY_MS, MAX_EVERY_MS)
         return loop(QUICK_TAP_ID, listOf(MultiPoint(x, y)), every, holdMs, now, waitAfterHold = true).apply {
-            name = "Auto tap · every ${FlowUi.sec(every)}"
+            name = "自动点击 · 每 ${FlowUi.sec(every)}"
         }
     }
 
@@ -27,7 +27,7 @@ object AutoTap {
     fun multiTap(points: List<MultiPoint>, everyMs: Long, holdMs: Long, now: Long, name: String? = null): Recording {
         val every = everyMs.coerceIn(MIN_EVERY_MS, MAX_EVERY_MS)
         return loop(MULTI_TAP_ID, points, every, holdMs, now).apply {
-            this.name = name ?: "Multi tap · ${points.size} targets · every ${FlowUi.sec(every)}"
+            this.name = name ?: "多点点击 · ${points.size} 个目标 · 每 ${FlowUi.sec(every)}"
         }
     }
 
@@ -36,7 +36,7 @@ object AutoTap {
         id: String, points: List<MultiPoint>, every: Long, hold: Long, now: Long, waitAfterHold: Boolean = false,
     ): Recording {
         val rec = Recording(id, "", now, mutableListOf())
-        val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = "Repeat")
+        val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = "重复")
         rec.flows.add(label)
         var at = 1L
         for (p in points) {
@@ -49,10 +49,10 @@ object AutoTap {
         return rec
     }
 
-    /** "Setup N" with N one past the highest number in use, so names never repeat after a delete. */
+    /** "设置 N" with N one past the highest number in use, so names never repeat after a delete. */
     fun nextSetupName(existing: List<String>): String {
         val pattern = Regex("""^Setup (\d+)$""")
         val used = existing.mapNotNull { pattern.find(it)?.groupValues?.get(1)?.toIntOrNull() }
-        return "Setup ${(used.maxOrNull() ?: 0) + 1}"
+        return "设置 ${(used.maxOrNull() ?: 0) + 1}"
     }
 }

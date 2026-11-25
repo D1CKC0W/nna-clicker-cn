@@ -139,12 +139,12 @@ object Ui {
         TBuilder(a, dialogTheme(p))
             .setTitle(title)
             .setView(box)
-            .setPositiveButton("Save") { _, _ -> onOk(input.text.toString().trim().replace(',', '.')) }
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton("保存") { _, _ -> onOk(input.text.toString().trim().replace(',', '.')) }
+            .setNegativeButton("取消", null)
             .show()
     }
 
-    fun fmtSec(ms: Long): String = String.format(java.util.Locale.US, "%.1f s", ms / 1000.0)
+    fun fmtSec(ms: Long): String = String.format(java.util.Locale.US, "%.1f 秒", ms / 1000.0)
 }
 
 /** Pembuat view kecil dengan gaya yang seragam. */

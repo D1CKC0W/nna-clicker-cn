@@ -46,7 +46,7 @@ class Player(
     fun start() {
         if (program.isEmpty) { onFinish(null); return }
         if (steps.any { it is ImageStep } && Build.VERSION.SDK_INT < 30) {
-            onFinish("Image steps need Android 11 or later, or Shizuku")
+            onFinish("图像步骤需要 Android 11 及以上，或 Shizuku")
             return
         }
         running = true

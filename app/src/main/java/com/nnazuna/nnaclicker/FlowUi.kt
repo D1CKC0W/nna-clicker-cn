@@ -12,12 +12,12 @@ import android.widget.TextView
 object FlowUi {
 
     /** "250 ms" below a second, otherwise seconds with up to two decimals: "1.5 s", "2 s". */
-    fun sec(ms: Long): String = if (ms in 1..999) "$ms ms" else "${secText(ms)} s"
+    fun sec(ms: Long): String = if (ms in 1..999) "$ms 毫秒" else "${secText(ms)} 秒"
 
     fun parseSec(v: String): Long? = v.trim().replace(',', '.').toDoubleOrNull()?.let { (it * 1000).toLong() }
 
-    /** A name for a new label that isn't used yet: "Label 1", "Label 2", … */
-    fun newLabelName(rec: Recording, prefix: String = "Label"): String {
+    /** A name for a new label that isn't used yet: "标签 1", "标签 2", … */
+    fun newLabelName(rec: Recording, prefix: String = "标签"): String {
         val used = rec.flows.filter { it.kind == FlowStep.LABEL }.map { it.name }.toSet()
         var n = 1
         while ("$prefix $n" in used) n++
@@ -30,20 +30,20 @@ object FlowUi {
         val labels = rec.labels()
         if (labels.isEmpty()) {
             TBuilder(a, Ui.dialogTheme(p))
-                .setTitle("No labels yet")
-                .setMessage("Add a Label step where the jump should land. Use Add step in the editor, then choose Label.")
+                .setTitle("暂无标签")
+                .setMessage("在跳转落地处添加一个标签步骤。在编辑器里用添加步骤，然后选择标签。")
                 .setPositiveButton("OK", null)
                 .show()
             return
         }
-        val names = labels.map { "${it.name}  ·  step ${steps.indexOf(it) + 1}" }.toTypedArray()
+        val names = labels.map { "${it.name}  ·  步骤 ${steps.indexOf(it) + 1}" }.toTypedArray()
         TBuilder(a, Ui.dialogTheme(p))
             .setTitle(title)
             .setSingleChoiceItems(names, labels.indexOfFirst { it.ref == current }) { d, which ->
                 d.dismiss()
                 onPick(labels[which].ref)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -53,8 +53,8 @@ object FlowUi {
         TBuilder(a, Ui.dialogTheme(p))
             .setTitle(title)
             .setView(box(a, p, null, listOf(null to input)))
-            .setPositiveButton("Save") { _, _ -> onOk(input.text.toString().trim()) }
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton("保存") { _, _ -> onOk(input.text.toString().trim()) }
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -68,17 +68,17 @@ object FlowUi {
         TBuilder(a, Ui.dialogTheme(p))
             .setTitle(title)
             .setView(box(a, p, help, inputs))
-            .setPositiveButton("Save") { _, _ -> onOk(inputs.map { it.second.text.toString().trim().replace(',', '.') }) }
-            .setNegativeButton("Cancel", null)
+            .setPositiveButton("保存") { _, _ -> onOk(inputs.map { it.second.text.toString().trim().replace(',', '.') }) }
+            .setNegativeButton("取消", null)
             .show()
     }
 
     /** Edit a wait step: a random time from [FlowStep.minMs] to [FlowStep.maxMs]. */
     fun editWait(a: Activity, p: Pal, st: FlowStep, onDone: () -> Unit) =
         numbersDialog(
-            a, p, "Wait (seconds)",
-            "Waits a random time between the two values. Use the same value for a fixed wait.",
-            listOf("From" to secText(st.minMs), "To" to secText(st.maxMs)), true,
+            a, p, "等待（秒）",
+            "在两个值之间等待随机时长。两个值相同则为固定等待。",
+            listOf("从" to secText(st.minMs), "到" to secText(st.maxMs)), true,
         ) { v ->
             val lo = parseSec(v[0]) ?: return@numbersDialog
             val hi = parseSec(v[1]) ?: lo
@@ -101,9 +101,9 @@ object FlowUi {
             .sortedBy { it.second.lowercase() }
         if (apps.isEmpty()) return
         AlertDialog.Builder(a, Ui.dialogTheme(p))
-            .setTitle(L.t("Open app"))
+            .setTitle(L.t("打开应用"))
             .setItems(apps.map { it.second }.toTypedArray()) { _, which -> onPick(apps[which].first, apps[which].second) }
-            .setNegativeButton(L.t("Cancel"), null)
+            .setNegativeButton(L.t("取消"), null)
             .show()
     }
 
@@ -111,9 +111,9 @@ object FlowUi {
     fun pickKey(a: Activity, p: Pal, onPick: (String) -> Unit) {
         val keys = listOf(FlowStep.KEY_BACK, FlowStep.KEY_HOME, FlowStep.KEY_RECENTS)
         TBuilder(a, Ui.dialogTheme(p))
-            .setTitle("System button")
+            .setTitle("系统按键")
             .setItems(keys.map { FlowStep.keyName(it) }.toTypedArray()) { _, which -> onPick(keys[which]) }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 

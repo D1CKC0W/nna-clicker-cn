@@ -31,7 +31,7 @@ object SnapPicker {
             val usage = storage.snapUsage()
             if (snaps.isEmpty()) {
                 list.addView(k.text(
-                    "No screenshots yet. Open the game, then press the camera button on the floating panel.",
+                    "暂无截图。打开游戏，然后按悬浮面板上的相机按钮。",
                     15f, 0, p.muted,
                 ).apply { setPadding(k.dp(8f), k.dp(12f), k.dp(8f), k.dp(12f)) })
                 return
@@ -58,7 +58,7 @@ object SnapPicker {
                 val col = LinearLayout(a).apply { orientation = LinearLayout.VERTICAL }
                 col.addView(k.text(fmt.format(Date(f.lastModified())), 15f, 1))
                 col.addView(k.text(
-                    if (used > 0) "Used by $used image step" + (if (used > 1) "s" else "") else "Not used",
+                    if (used > 0) "被 $used 个图像步骤使用" + (if (used > 1) "s" else "") else "未使用",
                     13f, 0, p.muted,
                 ).apply { setPadding(0, k.dp(3f), 0, 0) })
                 row.addView(col, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
@@ -68,10 +68,10 @@ object SnapPicker {
                     setOnClickListener {
                         if (used > 0) {
                             TBuilder(a, Ui.dialogTheme(p))
-                                .setTitle("Delete screenshot?")
-                                .setMessage("Image steps that use it keep working, but their area can't be changed without a new screenshot.")
-                                .setPositiveButton("Delete") { _, _ -> storage.deleteSnap(f.name); render() }
-                                .setNegativeButton("Cancel", null)
+                                .setTitle("删除截图？")
+                                .setMessage("使用它的图像步骤仍可工作，但没有新截图无法更改其区域。")
+                                .setPositiveButton("删除") { _, _ -> storage.deleteSnap(f.name); render() }
+                                .setNegativeButton("取消", null)
                                 .show()
                         } else {
                             storage.deleteSnap(f.name)
@@ -87,8 +87,8 @@ object SnapPicker {
         dialog = TBuilder(a, Ui.dialogTheme(p))
             .setTitle(title)
             .setView(ScrollView(a).apply { addView(list) })
-            .setNegativeButton("Close", null)
-            .setNeutralButton("Delete unused", null)
+            .setNegativeButton("关闭", null)
+            .setNeutralButton("删除未使用", null)
             .create()
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
@@ -96,9 +96,9 @@ object SnapPicker {
                 val unused = storage.snaps().filter { (usage[it.name] ?: 0) == 0 }
                 if (unused.isEmpty()) return@setOnClickListener
                 TBuilder(a, Ui.dialogTheme(p))
-                    .setTitle("Delete ${unused.size} unused screenshot" + (if (unused.size > 1) "s" else "") + "?")
-                    .setPositiveButton("Delete") { _, _ -> unused.forEach { storage.deleteSnap(it.name) }; render() }
-                    .setNegativeButton("Cancel", null)
+                    .setTitle("删除 ${unused.size} 张未使用截图" + (if (unused.size > 1) "s" else "") + "?")
+                    .setPositiveButton("删除") { _, _ -> unused.forEach { storage.deleteSnap(it.name) }; render() }
+                    .setNegativeButton("取消", null)
                     .show()
             }
         }

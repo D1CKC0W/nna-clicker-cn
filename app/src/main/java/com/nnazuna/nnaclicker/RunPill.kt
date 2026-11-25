@@ -47,9 +47,9 @@ internal class RunPill(svc: RecorderService) : ServiceOverlay(svc) {
     fun showRunPill(rec: Recording) {
         removeRunPill()
         val title = if (rec.id == AutoTap.MULTI_TAP_ID) {
-            "${rec.gestures.size} targets"
+            "${rec.gestures.size} 个目标"
         } else {
-            "Auto tap"
+            "自动点击"
         }
         val pill = LinearLayout(svc).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -74,20 +74,20 @@ internal class RunPill(svc: RecorderService) : ServiceOverlay(svc) {
             start()
         }
         pill.addView(TextView(svc).apply {
-            text = "RUNNING · ${title.uppercase()}"
+            text = "运行中 · ${title.uppercase()}"
             setTextColor(0xFFF1F4F2.toInt())
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             typeface = Ui.font(svc, 3)
             letterSpacing = 0.05f
         })
         pill.addView(TextView(svc).apply {
-            text = "Stop"
+            text = "停止"
             gravity = Gravity.CENTER
             setTextColor(0xFFFFFFFF.toInt())
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             typeface = Ui.font(svc, 2)
             setPadding(dp(14f), 0, dp(14f), 0)
-            contentDescription = "Stop auto tap"
+            contentDescription = "停止自动点击"
             background = RippleDrawable(
                 android.content.res.ColorStateList.valueOf(0x33FFFFFF),
                 GradientDrawable().apply { cornerRadius = dp(16f).toFloat(); setColor(COLOR_REC) },

@@ -65,9 +65,9 @@ class PanelTileService : TileService() {
         if (Build.VERSION.SDK_INT >= 29) {
             L.load(this)
             tile.subtitle = L.t(when {
-                svc == null -> "Off"
-                svc.isPanelShown -> "Panel on"
-                else -> "Panel off"
+                svc == null -> "关"
+                svc.isPanelShown -> "面板已开启"
+                else -> "面板已关闭"
             })
         }
         tile.updateTile()

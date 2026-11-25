@@ -37,12 +37,12 @@ class RecGesture(override var at: Long, val strokes: List<Stroke>) : Step {
     val kind: String
         get() = when {
             strokes.size > 1 -> "${strokes.size}-finger"
-            isTap -> "Tap"
+            isTap -> "点击"
             else -> {
                 val p = strokes[0].points
                 val dx = p.last().x - p.first().x
                 val dy = p.last().y - p.first().y
-                if (dx * dx + dy * dy < 400f) "Hold" else "Swipe"
+                if (dx * dx + dy * dy < 400f) "按住" else "滑动"
             }
         }
 
@@ -54,7 +54,7 @@ class RecGesture(override var at: Long, val strokes: List<Stroke>) : Step {
         })
 
     companion object {
-        /** Tap singkat di (x, y), untuk aksi "Tap image". */
+        /** Tap singkat di (x, y), untuk aksi "点击图像". */
         fun tap(x: Float, y: Float, at: Long = 0) =
             RecGesture(at, listOf(Stroke(listOf(TouchPoint(x, y, 0), TouchPoint(x, y, 60)))))
     }
@@ -90,9 +90,9 @@ class ImageStep(
 
     val title: String
         get() = when (action) {
-            ACTION_TAP -> "Tap image"
-            ACTION_GONE -> "Wait until image is gone"
-            else -> "Wait for image"
+            ACTION_TAP -> "点击图像"
+            ACTION_GONE -> "等待图像消失"
+            else -> "等待图像"
         }
 
     fun copy(newAt: Long = at) = ImageStep(
@@ -195,9 +195,9 @@ class FlowStep(
         const val KEY_RECENTS = "recents"
 
         fun keyName(ref: String) = when (ref) {
-            KEY_HOME -> "Home"
-            KEY_RECENTS -> "Recent apps"
-            else -> "Back"
+            KEY_HOME -> "主屏"
+            KEY_RECENTS -> "最近应用"
+            else -> "返回"
         }
 
         fun newId(): String = java.util.UUID.randomUUID().toString().take(8)
@@ -361,7 +361,7 @@ class Recording(
             }
             return Recording(
                 o.optString("id", java.util.UUID.randomUUID().toString()),
-                o.optString("name", "Recording"),
+                o.optString("name", "录制中"),
                 o.optLong("created", 0L),
                 gs,
                 imgs,

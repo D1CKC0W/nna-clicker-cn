@@ -514,18 +514,18 @@ class RecorderService : AccessibilityService() {
             }
         }
 
-        box.addView(row("Recordings", 0x99FFFFFF.toInt(), false, null).apply {
+        box.addView(row("录制", 0x99FFFFFF.toInt(), false, null).apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             setPadding(dp(12f), dp(2f), dp(12f), dp(4f))
         })
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        if (recs.isEmpty()) list.addView(row("No recordings yet", 0x99FFFFFF.toInt(), false, null))
+        if (recs.isEmpty()) list.addView(row("暂无录制", 0x99FFFFFF.toInt(), false, null))
         for (r in recs) {
             val on = r.id == selected
             list.addView(row((if (on) "✓  " else "     ") + r.name, if (on) COLOR_PLAY else 0xFFF1F4F2.toInt(), on) {
                 storage.selectedId = r.id
                 closeMenu()
-                toast("Selected: ${r.name}")
+                toast("已选择：${r.name}")
                 onChanged?.invoke()
             })
         }
@@ -537,11 +537,11 @@ class RecorderService : AccessibilityService() {
         ))
         box.addView(View(this).apply { setBackgroundColor(0x33FFFFFF) },
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1f)).apply { setMargins(dp(8f), dp(4f), dp(8f), dp(4f)) })
-        box.addView(row("Saved setups", COLOR_PLAY, true) { closeMenu(); setupList.showSetupList() })
-        box.addView(row("Multi tap here", COLOR_PLAY, true) { closeMenu(); multiTap.startMultiTap() })
-        box.addView(row("Auto tap here", COLOR_PLAY, true) { closeMenu(); quickTap.startQuickTap() })
-        box.addView(row("Open NNA Clicker", 0xFFF1F4F2.toInt(), false) { closeMenu(); openApp() })
-        box.addView(row("Shrink panel", 0xFFF1F4F2.toInt(), false) { setMinimized(true) })
+        box.addView(row("保存的设置", COLOR_PLAY, true) { closeMenu(); setupList.showSetupList() })
+        box.addView(row("此处多点点击", COLOR_PLAY, true) { closeMenu(); multiTap.startMultiTap() })
+        box.addView(row("此处自动点击", COLOR_PLAY, true) { closeMenu(); quickTap.startQuickTap() })
+        box.addView(row("打开 NNA Clicker", 0xFFF1F4F2.toInt(), false) { closeMenu(); openApp() })
+        box.addView(row("缩小面板", 0xFFF1F4F2.toInt(), false) { setMinimized(true) })
 
         val size = screenSize()
         val w = minOf(dp(280f), size.x - dp(16f))
@@ -566,7 +566,7 @@ class RecorderService : AccessibilityService() {
         wm.addView(box, params)
     }
 
-    /** Screen as a half-resolution frame, with the panel hidden. Used by the image step "Test" button. */
+    /** Screen as a half-resolution frame, with the panel hidden. Used by the image step "测试" button. */
     fun captureFrame(cb: (ScreenFrame?) -> Unit) {
         closeMenu()
         panel?.visibility = View.INVISIBLE
@@ -634,7 +634,7 @@ class RecorderService : AccessibilityService() {
                 shizukuActive = true
             } else {
                 val err = try { svc?.lastError() } catch (e: Exception) { null }
-                toast("Shizuku recording failed, using standard mode. ${err ?: ""}")
+                toast("Shizuku 录制失败，使用标准模式。${err ?: ""}")
             }
         }
 
@@ -720,14 +720,14 @@ class RecorderService : AccessibilityService() {
         recordedImages.clear()
 
         if (gestures.isEmpty() && images.isEmpty()) {
-            toast("Nothing recorded")
+            toast("未录制内容")
             return
         }
-        val name = L.t("Recording {}", SimpleDateFormat("MMM d, HH:mm:ss", Locale.US).format(Date()))
+        val name = L.t("录制 {}", SimpleDateFormat("MMM d, HH:mm:ss", Locale.US).format(Date()))
         val rec = Recording(UUID.randomUUID().toString(), name, System.currentTimeMillis(), gestures, images)
         storage.save(rec)
         storage.selectedId = rec.id
-        toast(if (images.isEmpty()) "Saved: $name" else "Saved: $name. Open the editor to choose the image areas.")
+        toast(if (images.isEmpty()) "已保存：$name" else "已保存：$name。打开编辑器选择图像区域。")
         onChanged?.invoke()
     }
 
@@ -751,7 +751,7 @@ class RecorderService : AccessibilityService() {
         multiTap.removeMultiGhost()
         val rec = storage.selected()
         if (rec == null || Program(rec).isEmpty) {
-            toast("No recording selected")
+            toast("未选择录制")
             return
         }
         rec.startAt = fromAt
@@ -762,14 +762,14 @@ class RecorderService : AccessibilityService() {
         playLoops = cfg.loops
         playMaxMin = cfg.maxMinutes
         val startDelay = maxOf(cfg.startDelayMs, minDelayMs)
-        if (rec.images.any { !it.ready }) toast("Some image steps have no area yet and will be skipped")
+        if (rec.images.any { !it.ready }) toast("某些图像步骤尚无区域，将被跳过")
         // Image matching corrects for the dim layer; keep it light enough to still see details.
         rec.dim = if (storage.dimScreen) dimFraction(rec) else 0f
         val loops = cfg.loops
         state = State.PLAYING
         updatePanel()
         if (rec.id == AutoTap.QUICK_TAP_ID || rec.id == AutoTap.MULTI_TAP_ID) runPill.showRunPill(rec)
-        status.text = L.t("Starting…")
+        status.text = L.t("启动中…")
         playTotal = Program(rec).steps.size
         playLoopNow = 1
         playStepNow = -1
@@ -797,7 +797,7 @@ class RecorderService : AccessibilityService() {
                 return
             }
             val err = try { svc.lastError() } catch (e: Exception) { "" }
-            toast("Shizuku playback failed, using standard mode. $err")
+            toast("Shizuku 播放失败，使用标准模式。$err")
         }
 
         shizukuActive = false
@@ -830,7 +830,7 @@ class RecorderService : AccessibilityService() {
     private val limitStop = Runnable {
         if (state == State.PLAYING) {
             stopPlaying(byUser = false)
-            toast("Auto stopped after $playMaxMin min")
+            toast("$playMaxMin 分钟后自动停止")
         }
     }
 
@@ -854,8 +854,8 @@ class RecorderService : AccessibilityService() {
     }
 
     private fun playText(): String {
-        if (paused) return L.t("Paused")
-        val loopPart = if (playLoops == 0) L.t("Loop {}", playLoopNow) else L.t("Loop {}", "$playLoopNow/$playLoops")
+        if (paused) return L.t("已暂停")
+        val loopPart = if (playLoops == 0) L.t("循环 {}", playLoopNow) else L.t("循环 {}", "$playLoopNow/$playLoops")
         return if (playStepNow >= 0 && playTotal > 0) "$loopPart · ${playStepNow + 1}/$playTotal" else loopPart
     }
 
@@ -913,17 +913,17 @@ class RecorderService : AccessibilityService() {
                     snapping = false
                     if (png == null) {
                         toast(
-                            if (Build.VERSION.SDK_INT < 30 && !useShizukuNow()) "Screenshots need Android 11 or later, or Shizuku"
-                            else "Couldn't take a screenshot. Try again."
+                            if (Build.VERSION.SDK_INT < 30 && !useShizukuNow()) "截图需要 Android 11 及以上，或 Shizuku"
+                            else "无法截图。请重试。"
                         )
                         return@post
                     }
                     val name = storage.saveSnap(png)
                     if (recording && state == State.RECORDING) {
                         recordedImages.add(ImageStep(at, name, screenW = size.x, screenH = size.y))
-                        toast("Image step added")
+                        toast("图像步骤已添加")
                     } else {
-                        toast("Screenshot saved. Use it in the editor with Add image step.")
+                        toast("截图已保存。在编辑器里用添加图像步骤使用它。")
                     }
                 }
             }

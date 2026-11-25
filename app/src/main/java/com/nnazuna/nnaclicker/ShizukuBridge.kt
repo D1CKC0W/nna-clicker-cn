@@ -150,7 +150,7 @@ object ShizukuBridge {
                 }
             } catch (e: Throwable) {
                 val cause = (e as? java.lang.reflect.InvocationTargetException)?.targetException ?: e
-                lastError = "Couldn't start Shizuku service: ${cause.message ?: cause}"
+                lastError = "无法启动 Shizuku 服务：${cause.message ?: cause}"
             } finally {
                 connecting = false
                 changed()

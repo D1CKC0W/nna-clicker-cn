@@ -44,13 +44,13 @@ class RunLogActivity : Activity() {
             background = k.ripple(null, k.dp(22f).toFloat())
             setOnClickListener { finish() }
         })
-        top.addView(k.text("Run log", 22f, 2).apply { setPadding(k.dp(6f), 0, 0, 0) },
+        top.addView(k.text("运行日志", 22f, 2).apply { setPadding(k.dp(6f), 0, 0, 0) },
             LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        top.addView(k.textButton("Clear", p.play) { confirmClear() })
+        top.addView(k.textButton("清除", p.play) { confirmClear() })
         root.addView(top)
         root.addView(k.text(
-            "When playback stops because an image wasn't found, the screen at that moment is saved here. " +
-                "Tap an entry to see it and fix the step.",
+            "当播放因未找到图像而停止时，当时的屏幕会保存在这里。" +
+                "点击一条记录查看并修复步骤。",
             14f, 0, p.muted,
         ).apply { setPadding(k.dp(50f), k.dp(2f), 0, k.dp(12f)) })
 
@@ -72,7 +72,7 @@ class RunLogActivity : Activity() {
         val entries = storage.runLog()
         if (entries.isEmpty()) {
             listBox.addView(k.group().apply {
-                addView(k.text("Nothing here yet. Good news: no playback has stopped with a problem.", 14.5f, 0, p.muted).apply {
+                addView(k.text("这里暂无内容。好消息：没有播放因问题而停止过。", 14.5f, 0, p.muted).apply {
                     setPadding(k.dp(16f), k.dp(18f), k.dp(16f), k.dp(18f))
                 })
             })
@@ -110,8 +110,8 @@ class RunLogActivity : Activity() {
     }
 
     private fun summary(e: RunLogEntry): String = when {
-        e.stepNo > 0 && e.closest >= 0 -> L.t("Step {} · closest {}%, needs {}%", e.stepNo, e.closest, e.need)
-        e.stepNo > 0 -> L.t("Step {} · image not found", e.stepNo)
+        e.stepNo > 0 && e.closest >= 0 -> L.t("步骤 {} · 最接近 {}%，需要 {}%", e.stepNo, e.closest, e.need)
+        e.stepNo > 0 -> L.t("步骤 {} · 未找到图像", e.stepNo)
         else -> L.t(e.message)
     }
 
@@ -143,7 +143,7 @@ class RunLogActivity : Activity() {
         found?.second?.let { st ->
             templateBitmap(st)?.let { t ->
                 val r = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-                r.addView(k.text("Looking for", 13.5f, 1, p.muted).apply { setPadding(0, 0, k.dp(10f), 0) })
+                r.addView(k.text("查找中", 13.5f, 1, p.muted).apply { setPadding(0, 0, k.dp(10f), 0) })
                 r.addView(ImageView(this).apply {
                     setImageBitmap(t)
                     scaleType = ImageView.ScaleType.FIT_START
@@ -157,23 +157,23 @@ class RunLogActivity : Activity() {
         val b = TBuilder(this, Ui.dialogTheme(p))
             .setTitle(L.t("{} · step {}", e.recName, e.stepNo))
             .setView(ScrollView(this).apply { addView(box) })
-            .setNegativeButton(L.t("Close"), null)
+            .setNegativeButton(L.t("关闭"), null)
         if (found != null) {
-            b.setPositiveButton(L.t("Fix step")) { _, _ -> fixes(e, found.first, found.second) }
+            b.setPositiveButton(L.t("修复步骤")) { _, _ -> fixes(e, found.first, found.second) }
         }
         b.show()
     }
 
     private fun advice(e: RunLogEntry, stepExists: Boolean): String = when {
-        !stepExists -> L.t("This step has been changed or deleted since then.")
-        e.closest >= 50 -> L.t("The closest match was {}%, but {}% is needed. If the right thing is on screen, lower the match or use this screenshot.", e.closest, e.need)
-        e.closest >= 0 -> L.t("Nothing similar was on the screen. The game may have shown a different screen, a popup, or loaded slowly.")
+        !stepExists -> L.t("此步骤此后已被更改或删除。")
+        e.closest >= 50 -> L.t("最接近的匹配为 {}%，但需要 {}%。若正确内容在屏幕上，请降低匹配度或使用此截图。", e.closest, e.need)
+        e.closest >= 0 -> L.t("屏幕上没有相似内容。可能是显示了不同画面、弹出了窗口，或加载较慢。")
         else -> L.t(e.message)
     }
 
     private fun fixes(e: RunLogEntry, rec: Recording, st: ImageStep) {
         val options = mutableListOf<Pair<String, () -> Unit>>()
-        if (storage.logShot(e) != null) options += L.t("Use this screenshot for the step") to {
+        if (storage.logShot(e) != null) options += L.t("将此截图用于该步骤") to {
             val name = storage.snapFromLog(e)
             if (name != null) {
                 st.snap = name
@@ -181,26 +181,26 @@ class RunLogActivity : Activity() {
                 openStep(rec, st)
             }
         }
-        if (e.closest >= 50) options += L.t("Set match to {}%", (e.closest - 3).coerceIn(50, 99)) to {
+        if (e.closest >= 50) options += L.t("设置匹配度为 {}%", (e.closest - 3).coerceIn(50, 99)) to {
             st.threshold = (e.closest - 3).coerceIn(50, 99) / 100f
             storage.save(rec)
-            toast(L.t("Match set to {}%", (st.threshold * 100).toInt()))
+            toast(L.t("匹配度已设为 {}%", (st.threshold * 100).toInt()))
         }
-        if (!st.anywhere) options += L.t("Search anywhere on the screen") to {
+        if (!st.anywhere) options += L.t("在整个屏幕搜索") to {
             st.anywhere = true
             storage.save(rec)
-            toast(L.t("The step now searches the whole screen"))
+            toast(L.t("此步骤现在搜索整个屏幕"))
         }
-        if (st.timeoutMs in 1..59_999) options += L.t("Wait longer ({} s)", st.timeoutMs * 2 / 1000) to {
+        if (st.timeoutMs in 1..59_999) options += L.t("等待更久（{} 秒）", st.timeoutMs * 2 / 1000) to {
             st.timeoutMs = st.timeoutMs * 2
             storage.save(rec)
-            toast(L.t("The step now waits up to {} s", st.timeoutMs / 1000))
+            toast(L.t("此步骤现在最多等待 {} 秒", st.timeoutMs / 1000))
         }
-        options += L.t("Open the step") to { openStep(rec, st) }
+        options += L.t("打开步骤") to { openStep(rec, st) }
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle(L.t("Fix step {}", e.stepNo))
+            .setTitle(L.t("修复步骤 {}", e.stepNo))
             .setItems(options.map { it.first }.toTypedArray()) { _, which -> options[which].second() }
-            .setNegativeButton(L.t("Cancel"), null)
+            .setNegativeButton(L.t("取消"), null)
             .show()
     }
 
@@ -214,19 +214,19 @@ class RunLogActivity : Activity() {
 
     private fun confirmDelete(e: RunLogEntry) {
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle(L.t("Delete this entry?"))
-            .setPositiveButton(L.t("Delete")) { _, _ -> storage.deleteRunLog(e); render() }
-            .setNegativeButton(L.t("Cancel"), null)
+            .setTitle(L.t("删除此记录？"))
+            .setPositiveButton(L.t("删除")) { _, _ -> storage.deleteRunLog(e); render() }
+            .setNegativeButton(L.t("取消"), null)
             .show()
     }
 
     private fun confirmClear() {
         if (storage.runLog().isEmpty()) return
         TBuilder(this, Ui.dialogTheme(p))
-            .setTitle(L.t("Clear the run log?"))
-            .setMessage(L.t("All entries and their screenshots will be deleted."))
-            .setPositiveButton(L.t("Clear")) { _, _ -> storage.clearRunLog(); render() }
-            .setNegativeButton(L.t("Cancel"), null)
+            .setTitle(L.t("清除运行日志？"))
+            .setMessage(L.t("所有记录及其截图将被删除。"))
+            .setPositiveButton(L.t("清除")) { _, _ -> storage.clearRunLog(); render() }
+            .setNegativeButton(L.t("取消"), null)
             .show()
     }
 

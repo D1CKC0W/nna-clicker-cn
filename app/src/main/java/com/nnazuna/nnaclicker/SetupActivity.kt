@@ -39,8 +39,8 @@ class SetupActivity : Activity() {
             setBackgroundColor(headerBg)
             setPadding(k.dp(16f), k.dp(26f), k.dp(16f), k.dp(18f))
         }
-        header.addView(k.text("Setup", 34f, 3, headerInk))
-        header.addView(k.text("Four steps to set up NNA Clicker.", 14f, 0, headerInk).apply {
+        header.addView(k.text("设置", 34f, 3, headerInk))
+        header.addView(k.text("四步设置 NNA Clicker。", 14f, 0, headerInk).apply {
             alpha = 0.75f
             setPadding(0, k.dp(4f), 0, 0)
         })
@@ -51,7 +51,7 @@ class SetupActivity : Activity() {
         }
         list = k.group()
         root.addView(list)
-        root.addView(k.pillButton("Done", p.ink) {
+        root.addView(k.pillButton("完成", p.ink) {
             storage.setupSeen = true
             finish()
         })
@@ -104,18 +104,18 @@ class SetupActivity : Activity() {
 
         if (Build.VERSION.SDK_INT >= 33) {
             addStep(card(
-                n++, "Allow restricted settings",
-                "App info › ⋮ (top right) › Allow restricted settings. Needed once, before the next step.",
-                done = a11y, optional = false, action = if (a11y) null else "Open app info",
+                n++, "允许受限设置",
+                "应用信息 › ⋮（右上角）› 允许受限设置。只需一次，在下一步之前。",
+                done = a11y, optional = false, action = if (a11y) null else "打开应用信息",
             ) {
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
             })
         }
 
         addStep(card(
-            n++, "Turn on NNA Clicker",
-            "Accessibility › Installed apps › NNA Clicker › On",
-            done = a11y, optional = false, action = if (a11y) null else "Open accessibility",
+            n++, "开启 NNA Clicker",
+            "无障碍 › 已安装的应用 › NNA Clicker › 开",
+            done = a11y, optional = false, action = if (a11y) null else "打开无障碍",
         ) {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         })
@@ -125,11 +125,11 @@ class SetupActivity : Activity() {
         val perm = ShizukuBridge.hasPermission()
         val connected = storage.useShizuku && ShizukuBridge.isConnected
         val (shzText, shzAction) = when {
-            connected -> Pair("Connected. Recording has no delay.", null)
-            !installed -> Pair("Zero-delay recording and faster image steps.", "Get Shizuku")
-            !running -> Pair("Installed but not running. Open it and press Start.", "Open Shizuku")
-            !perm -> Pair("Running. Allow NNA Clicker to use it.", "Allow")
-            else -> Pair("Ready to connect.", "Connect")
+            connected -> Pair("已连接。录制无延时。", null)
+            !installed -> Pair("零延时录制和更快的图像步骤。", "获取 Shizuku")
+            !running -> Pair("已安装但未运行。打开它并按开始。", "打开 Shizuku")
+            !perm -> Pair("运行中。允许 NNA Clicker 使用它。", "允许")
+            else -> Pair("准备连接。", "连接")
         }
         addStep(card(n++, "Shizuku", shzText, done = connected, optional = true, action = shzAction) {
             when {
@@ -146,9 +146,9 @@ class SetupActivity : Activity() {
 
         val panelShown = RecorderService.instance?.isPanelShown == true
         addStep(card(
-            n, "Show the panel",
-            "Record with the red button, play with the triangle. Volume Down stops.",
-            done = panelShown, optional = false, action = if (!a11y) null else if (panelShown) null else "Show panel",
+            n, "显示面板",
+            "用红色按钮录制，三角形播放。音量下键停止。",
+            done = panelShown, optional = false, action = if (!a11y) null else if (panelShown) null else "显示面板",
         ) {
             RecorderService.instance?.showPanel()
             render()
@@ -174,7 +174,7 @@ class SetupActivity : Activity() {
         val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val head = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         head.addView(k.text(title, 16f, 2))
-        if (optional) head.addView(k.text("OPTIONAL", 10f, 2, p.muted).apply {
+        if (optional) head.addView(k.text("可选", 10f, 2, p.muted).apply {
             letterSpacing = 0.08f
             setPadding(k.dp(8f), 0, 0, 0)
         })

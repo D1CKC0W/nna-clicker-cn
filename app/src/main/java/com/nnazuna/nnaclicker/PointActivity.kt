@@ -63,7 +63,7 @@ class PointActivity : Activity() {
         val e = editing
         if (e != null) {
             val pts = e.strokes[0].points
-            swipe = e.kind == "Swipe"
+            swipe = e.kind == "滑动"
             points.add(PointF(pts.first().x, pts.first().y))
             if (swipe) points.add(PointF(pts.last().x, pts.last().y))
             duration = e.duration
@@ -109,23 +109,23 @@ class PointActivity : Activity() {
             setOnClickListener { finish() }
         })
         val title = when {
-            auto && swipe -> "Auto swipe"
-            auto -> "Auto tap"
-            editing != null && swipe -> "Edit swipe"
-            editing != null -> "Edit tap"
-            swipe -> "Add swipe"
-            else -> "Add tap"
+            auto && swipe -> "自动滑动"
+            auto -> "自动点击"
+            editing != null && swipe -> "编辑滑动"
+            editing != null -> "编辑点击"
+            swipe -> "添加滑动"
+            else -> "添加点击"
         }
         top.addView(k.text(title, 22f, 2).apply { setPadding(k.dp(6f), 0, 0, 0) },
             LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        top.addView(k.textButton("Save", p.play) { save() })
+        top.addView(k.textButton("保存", p.play) { save() })
         root.addView(top)
 
         val bmp = shot
         if (bmp != null) {
             root.addView(k.text(
-                if (swipe) "Drag START and END, or tap to move the nearest one. Pinch or double-tap to zoom."
-                else "Drag the circle, or tap where it should go. Pinch or double-tap to zoom.",
+                if (swipe) "拖动起点和终点，或点击移动最近的。双指缩放或双击放大。"
+                else "拖动圆圈，或点击目标位置。双指缩放或双击放大。",
                 14f, 0, p.muted,
             ).apply { setPadding(k.dp(8f), k.dp(4f), k.dp(8f), k.dp(8f)) })
             val maxH = resources.displayMetrics.heightPixels * 55 / 100
@@ -148,24 +148,24 @@ class PointActivity : Activity() {
             }
             bar.addView(zbtn("−") { pv.zoomBy(1 / 1.6f) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = k.dp(6f) })
             bar.addView(zbtn("+") { pv.zoomBy(1.6f) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = k.dp(6f) })
-            bar.addView(k.textButton("Zoom in", p.play) { pv.zoomToPoints() })
-            bar.addView(k.textButton("Fit", p.play) { pv.resetZoom() })
+            bar.addView(k.textButton("放大", p.play) { pv.zoomToPoints() })
+            bar.addView(k.textButton("适应", p.play) { pv.resetZoom() })
             root.addView(bar)
         } else {
             root.addView(k.text(
-                "No screenshot yet. Press the camera button on the floating panel in the game, or type the position below.",
+                "暂无截图。在游戏里按悬浮面板上的相机按钮，或在下方输入位置。",
                 14.5f, 0, p.muted,
             ).apply { setPadding(k.dp(8f), k.dp(8f), k.dp(8f), k.dp(8f)) })
         }
-        root.addView(k.textButton("Use another screenshot", p.play) {
-            SnapPicker.show(this, k, storage, "Use screenshot") { f ->
+        root.addView(k.textButton("使用其他截图", p.play) {
+            SnapPicker.show(this, k, storage, "使用截图") { f ->
                 snapName = f.name
                 loadShot()
                 recreateContent()
             }
         }.apply { setPadding(k.dp(8f), k.dp(10f), k.dp(8f), k.dp(10f)) })
 
-        root.addView(k.sectionHeader(if (swipe) "Swipe" else "Tap"))
+        root.addView(k.sectionHeader(if (swipe) "滑动" else "点击"))
         val g = k.group()
         coordRows = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         g.addView(coordRows)
@@ -182,7 +182,7 @@ class PointActivity : Activity() {
 
     private fun renderCoords() {
         coordRows.removeAllViews()
-        val labels = if (swipe) listOf("Start", "End") else listOf("Position")
+        val labels = if (swipe) listOf("开始", "终点") else listOf("位置")
         points.forEachIndexed { i, pt ->
             if (i > 0) coordRows.addView(k.divider())
             val (row, v) = k.valueRow(labels[i]) { editPoint(i) }
@@ -190,8 +190,8 @@ class PointActivity : Activity() {
             coordRows.addView(row)
         }
         coordRows.addView(k.divider())
-        val (row, v) = k.valueRow(if (swipe) "Duration" else "Hold", if (swipe) null else "Longer than 250 ms becomes a hold") {
-            Ui.numberDialog(this, p, if (swipe) "Duration (ms)" else "Hold (ms)", duration.toString(), false) { s ->
+        val (row, v) = k.valueRow(if (swipe) "时长" else "按住", if (swipe) null else "超过 250 毫秒变为按住") {
+            Ui.numberDialog(this, p, if (swipe) "时长（毫秒）" else "按住（毫秒）", duration.toString(), false) { s ->
                 s.toLongOrNull()?.let { duration = it.coerceIn(if (swipe) 50L else 20L, 20_000L); renderCoords() }
             }
         }
@@ -200,18 +200,18 @@ class PointActivity : Activity() {
         if (swipe) {
             coordRows.addView(k.divider())
             val dist = hypot(points[1].x - points[0].x, points[1].y - points[0].y).toInt()
-            val (r2, v2) = k.valueRow("Distance")
+            val (r2, v2) = k.valueRow("距离")
             v2.text = "$dist px"
             coordRows.addView(r2)
         }
         if (auto) {
             coordRows.addView(k.divider())
-            val (r3, v3) = k.valueRow("Repeat every", "Pause after each ${if (swipe) "swipe" else "tap"}. Runs until you stop it.") {
-                Ui.numberDialog(this, p, "Repeat every (ms)", everyMs.toString(), false, "1000 ms = 1 second") { s ->
+            val (r3, v3) = k.valueRow("重复间隔", "Pause after each ${if (swipe) "swipe" else "tap"}. Runs until you stop it.") {
+                Ui.numberDialog(this, p, "重复间隔（毫秒）", everyMs.toString(), false, "1000 ms = 1 second") { s ->
                     s.toLongOrNull()?.let { everyMs = it.coerceIn(10L, 3_600_000L); renderCoords() }
                 }
             }
-            v3.text = "$everyMs ms"
+            v3.text = "$everyMs 毫秒"
             coordRows.addView(r3)
         }
     }
@@ -245,7 +245,7 @@ class PointActivity : Activity() {
 
     private fun save() {
         if (swipe && hypot(points[1].x - points[0].x, points[1].y - points[0].y) < 20f) {
-            LToast.makeText(this, "Move START and END further apart", Toast.LENGTH_SHORT).show()
+            LToast.makeText(this, "将起点和终点移得更远", Toast.LENGTH_SHORT).show()
             return
         }
         if (auto) { saveAuto(); return }
@@ -269,20 +269,20 @@ class PointActivity : Activity() {
             rec.gestures.add(g)
         }
         storage.save(rec)
-        LToast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+        LToast.makeText(this, "已保存", Toast.LENGTH_SHORT).show()
         finish()
     }
 
     /** Label → tap/swipe → (pause) → go to label, every time. */
     private fun saveAuto() {
-        val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = "Repeat")
+        val label = FlowStep(0, FlowStep.LABEL, ref = FlowStep.newId(), name = "重复")
         val g = gesture(1)
         val jump = FlowStep(g.at + g.duration + everyMs, FlowStep.GOTO, ref = label.ref)
         rec.flows.add(label); rec.gestures.add(g); rec.flows.add(jump)
-        rec.name = (if (swipe) "Auto swipe" else "Auto tap") + " · every ${FlowUi.sec(everyMs)}"
+        rec.name = (if (swipe) "自动滑动" else "自动点击") + " · 每 ${FlowUi.sec(everyMs)}"
         storage.save(rec)
         storage.selectedId = rec.id
-        LToast.makeText(this, "Saved and selected. Open the game and press play on the panel.", Toast.LENGTH_LONG).show()
+        LToast.makeText(this, "已保存并选中。打开游戏并在面板上按播放。", Toast.LENGTH_LONG).show()
         finish()
     }
 }

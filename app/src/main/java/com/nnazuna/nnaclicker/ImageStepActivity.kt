@@ -70,14 +70,14 @@ class ImageStepActivity : Activity() {
             background = k.ripple(null, k.dp(22f).toFloat())
             setOnClickListener { finish() }
         })
-        top.addView(k.text("Image step", 22f, 2).apply { setPadding(k.dp(6f), 0, 0, 0) },
+        top.addView(k.text("图像步骤", 22f, 2).apply { setPadding(k.dp(6f), 0, 0, 0) },
             LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        top.addView(k.textButton("Save", p.play) { save() })
+        top.addView(k.textButton("保存", p.play) { save() })
         root.addView(top)
 
         val bmp = shot
         if (bmp != null) {
-            root.addView(k.text("Drag a box around what to look for. Pinch or double-tap to zoom, move with two fingers.", 14f, 0, p.muted).apply {
+            root.addView(k.text("围绕要查找的内容画框。双指缩放或双击放大，双指移动。", 14f, 0, p.muted).apply {
                 setPadding(k.dp(8f), k.dp(4f), k.dp(8f), k.dp(8f))
             })
             val initial = if (step.w > 0 && step.h > 0) Rect(step.x, step.y, step.x + step.w, step.y + step.h)
@@ -103,8 +103,8 @@ class ImageStepActivity : Activity() {
             }
             bar.addView(zbtn("−") { cv.zoomBy(1 / 1.6f) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = k.dp(6f) })
             bar.addView(zbtn("+") { cv.zoomBy(1.6f) }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = k.dp(6f) })
-            bar.addView(k.textButton("Zoom to box", p.play) { cv.zoomToSelection() })
-            bar.addView(k.textButton("Fit", p.play) { cv.resetZoom() })
+            bar.addView(k.textButton("缩放到选框", p.play) { cv.zoomToSelection() })
+            bar.addView(k.textButton("适应", p.play) { cv.resetZoom() })
             bar.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
             val preview = ImageView(this).apply {
                 scaleType = ImageView.ScaleType.FIT_CENTER
@@ -122,8 +122,8 @@ class ImageStepActivity : Activity() {
             showPreview(cv.selection())
         } else {
             root.addView(k.text(
-                if (step.ready) "The original screenshot is gone. Pick a new one to change the area."
-                else "Pick a screenshot to choose the area.",
+                if (step.ready) "原始截图已不存在。选一张新的来更改区域。"
+                else "选择截图以选取区域。",
                 14.5f, 0, p.muted,
             ).apply { setPadding(k.dp(8f), k.dp(8f), k.dp(8f), k.dp(8f)) })
             if (step.ready) {
@@ -136,34 +136,34 @@ class ImageStepActivity : Activity() {
             }
         }
         val links = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-        links.addView(k.textButton("Test on screen", p.play) { test() }.apply {
+        links.addView(k.textButton("在屏幕上测试", p.play) { test() }.apply {
             setPadding(k.dp(8f), k.dp(10f), k.dp(12f), k.dp(10f))
         })
-        links.addView(k.textButton("Use another screenshot", p.play) { pickScreenshot() }.apply {
+        links.addView(k.textButton("使用其他截图", p.play) { pickScreenshot() }.apply {
             setPadding(k.dp(8f), k.dp(10f), k.dp(8f), k.dp(10f))
         })
         root.addView(links)
 
         // ---- Options ----
-        root.addView(k.sectionHeader("When playing"))
+        root.addView(k.sectionHeader("播放时"))
         val g = k.group()
-        actionBox = segRow(g, "Action")
+        actionBox = segRow(g, "操作")
         g.addView(k.divider())
-        searchBox = segRow(g, "Search")
+        searchBox = segRow(g, "搜索")
         g.addView(k.divider())
-        k.valueRow("Wait up to", "How long to look. 0 = check once") {
-            Ui.numberDialog(this, p, "Wait up to (seconds)", (step.timeoutMs / 1000).toString(), false,
-                "0 checks the screen once. Use it with \"If found\" and \"If not found\" to choose what runs next.") { v ->
+        k.valueRow("最多等待", "查找时长。0 = 仅检查一次") {
+            Ui.numberDialog(this, p, "最多等待（秒）", (step.timeoutMs / 1000).toString(), false,
+                "0 表示仅检查一次屏幕。配合如果找到和如果未找到来选择下一步执行什么。") { v ->
                 v.toLongOrNull()?.let { step.timeoutMs = (it.coerceIn(0, 3600)) * 1000; refresh() }
             }
         }.let { (row, v) -> timeoutValue = v; g.addView(row) }
         g.addView(k.divider())
-        foundBox = segRow(g, "If found")
+        foundBox = segRow(g, "如果找到")
         g.addView(k.divider())
-        failBox = segRow(g, "If not found")
+        failBox = segRow(g, "如果未找到")
         g.addView(k.divider())
-        k.valueRow("Match", "Lower finds more, but may find the wrong thing") {
-            Ui.numberDialog(this, p, "Match (%)", (step.threshold * 100).toInt().toString(), false, "50–99, default 82") { v ->
+        k.valueRow("匹配", "数值越低找到越多，但可能找错") {
+            Ui.numberDialog(this, p, "匹配（%）", (step.threshold * 100).toInt().toString(), false, "50–99, default 82") { v ->
                 v.toIntOrNull()?.let { step.threshold = it.coerceIn(50, 99) / 100f; refresh() }
             }
         }.let { (row, v) -> matchValue = v; g.addView(row) }
@@ -211,32 +211,32 @@ class ImageStepActivity : Activity() {
     }
 
     private fun refresh() {
-        fill(actionBox, listOf("Wait for it", "Tap it", "Wait until gone"), step.action) { step.action = it }
-        fill(searchBox, listOf("Near this spot", "Anywhere"), if (step.anywhere) 1 else 0) { step.anywhere = it == 1 }
+        fill(actionBox, listOf("等待出现", "点击它", "等待消失"), step.action) { step.action = it }
+        fill(searchBox, listOf("在此点附近", "任意位置"), if (step.anywhere) 1 else 0) { step.anywhere = it == 1 }
         val gone = step.action == ImageStep.ACTION_GONE
-        rowLabel(foundBox).text = L.t(if (gone) "If gone" else "If found")
-        rowLabel(failBox).text = L.t(if (gone) "If still there" else "If not found")
-        fill(foundBox, listOf("Next step", gotoText(step.foundGoto)), if (step.foundGoto != null) 1 else 0) { i ->
+        rowLabel(foundBox).text = L.t(if (gone) "如果消失" else "如果找到")
+        rowLabel(failBox).text = L.t(if (gone) "如果仍在" else "如果未找到")
+        fill(foundBox, listOf("下一步", gotoText(step.foundGoto)), if (step.foundGoto != null) 1 else 0) { i ->
             if (i == 0) step.foundGoto = null
-            else FlowUi.pickLabel(this, p, rec, step.foundGoto, "Then go to") { step.foundGoto = it; refresh() }
+            else FlowUi.pickLabel(this, p, rec, step.foundGoto, "然后跳到") { step.foundGoto = it; refresh() }
         }
-        fill(failBox, listOf("Stop", "Next step", gotoText(step.failGoto.takeIf { step.onTimeout == ImageStep.ON_TIMEOUT_GOTO })),
+        fill(failBox, listOf("停止", "下一步", gotoText(step.failGoto.takeIf { step.onTimeout == ImageStep.ON_TIMEOUT_GOTO })),
             step.onTimeout) { i ->
             if (i < 2) step.onTimeout = i
-            else FlowUi.pickLabel(this, p, rec, step.failGoto, "Then go to") {
+            else FlowUi.pickLabel(this, p, rec, step.failGoto, "然后跳到") {
                 step.failGoto = it; step.onTimeout = ImageStep.ON_TIMEOUT_GOTO; refresh()
             }
         }
-        timeoutValue.text = if (step.timeoutMs <= 0) L.t("Check once") else "${step.timeoutMs / 1000} s"
+        timeoutValue.text = if (step.timeoutMs <= 0) L.t("仅检查一次") else "${step.timeoutMs / 1000} 秒"
         matchValue.text = "${(step.threshold * 100).toInt()}%"
     }
 
     private fun rowLabel(box: LinearLayout) = (box.parent as LinearLayout).getChildAt(0) as TextView
 
-    private fun gotoText(label: String?) = label?.let { "→ ${rec.labelName(it) ?: "?"}" } ?: "Go to…"
+    private fun gotoText(label: String?) = label?.let { "→ ${rec.labelName(it) ?: "?"}" } ?: "跳转到…"
 
     private fun pickScreenshot() {
-        SnapPicker.show(this, k, storage, "Use screenshot") { file ->
+        SnapPicker.show(this, k, storage, "使用截图") { file ->
             saveOptionsOnly()
             step.snap = file.name
             step.w = 0; step.h = 0
@@ -262,7 +262,7 @@ class ImageStepActivity : Activity() {
         if (bmp != null && cv != null) {
             val r = cv.selection()
             if (r.width() < 16 || r.height() < 16) {
-                LToast.makeText(this, "Select a bigger area", Toast.LENGTH_SHORT).show()
+                LToast.makeText(this, "选择更大的区域", Toast.LENGTH_SHORT).show()
                 return null
             }
             val px = IntArray(bmp.width * bmp.height)
@@ -272,7 +272,7 @@ class ImageStepActivity : Activity() {
             target.screenW = bmp.width; target.screenH = bmp.height
             target.tw = t.w; target.th = t.h; target.tpl = t.rgb
         } else if (!target.ready) {
-            LToast.makeText(this, "Pick a screenshot first", Toast.LENGTH_SHORT).show()
+            LToast.makeText(this, "请先选择一张截图", Toast.LENGTH_SHORT).show()
             return null
         }
         return target
@@ -281,7 +281,7 @@ class ImageStepActivity : Activity() {
     private fun save() {
         buildStep(apply = true) ?: return
         storage.save(rec)
-        LToast.makeText(this, "Image step saved", Toast.LENGTH_SHORT).show()
+        LToast.makeText(this, "图像步骤已保存", Toast.LENGTH_SHORT).show()
         finish()
     }
 
@@ -297,11 +297,11 @@ class ImageStepActivity : Activity() {
     private fun test() {
         val svc = RecorderService.instance
         if (svc == null) {
-            LToast.makeText(this, "Turn on the accessibility service first", Toast.LENGTH_SHORT).show()
+            LToast.makeText(this, "请先开启无障碍服务", Toast.LENGTH_SHORT).show()
             return
         }
         val tmp = buildStep(apply = false) ?: return
-        LToast.makeText(this, "Open the game. Checking the screen in 3 seconds…", Toast.LENGTH_LONG).show()
+        LToast.makeText(this, "打开游戏。3 秒后检查屏幕…", Toast.LENGTH_LONG).show()
         moveTaskToBack(true)
         handler.postDelayed({
             svc.captureFrame { frame ->
@@ -326,30 +326,30 @@ class ImageStepActivity : Activity() {
         val best = (d.best * 100).toInt().coerceAtLeast(0)
         val b = TBuilder(this, Ui.dialogTheme(p))
         when {
-            !captured -> b.setTitle("Couldn't capture the screen")
-                .setMessage("Connect Shizuku, or use Android 11 or later.")
+            !captured -> b.setTitle("无法捕获屏幕")
+                .setMessage("请连接 Shizuku，或使用 Android 11 及以上。")
                 .setPositiveButton("OK", null)
-            m != null -> b.setTitle("Found · ${(m.score * 100).toInt()}%")
+            m != null -> b.setTitle("找到 · ${(m.score * 100).toInt()}%")
                 .setMessage(
-                    if (tmp.action == ImageStep.ACTION_TAP) "It will be tapped at ${m.x}, ${m.y}."
-                    else "Found at ${m.x}, ${m.y}."
+                    if (tmp.action == ImageStep.ACTION_TAP) "将在 ${m.x}, ${m.y} 点击。"
+                    else "在 ${m.x}, ${m.y} 找到。"
                 )
                 .setPositiveButton("OK", null)
-            d.colorRejected -> b.setTitle("Shape matches, colors don't")
-                .setMessage("The shape matched $best%, but the colors are different. The button may look disabled on this screen.")
+            d.colorRejected -> b.setTitle("形状匹配，颜色不符")
+                .setMessage("形状匹配 $best%，但颜色不同。该按钮在此画面上可能显示为禁用。")
                 .setPositiveButton("OK", null)
-            best >= 50 -> b.setTitle("Not found")
-                .setMessage("Closest match was $best%, below the $need% needed." +
-                    if (!tmp.anywhere) " It might also be outside the search area." else "")
-                .setPositiveButton("Set match to ${best - 3}%") { _, _ ->
+            best >= 50 -> b.setTitle("未找到")
+                .setMessage("最接近的匹配为 $best%，低于所需的 $need%。" +
+                    if (!tmp.anywhere) " 它也可能在搜索区域之外。" else "")
+                .setPositiveButton("设置匹配度为 ${best - 3}%") { _, _ ->
                     step.threshold = (best - 3).coerceIn(50, 99) / 100f
                     refresh()
                 }
-                .setNeutralButton(if (tmp.anywhere) "OK" else "Search anywhere") { _, _ ->
+                .setNeutralButton(if (tmp.anywhere) "OK" else "全屏搜索") { _, _ ->
                     if (!tmp.anywhere) { step.anywhere = true; refresh() }
                 }
-            else -> b.setTitle("Not found")
-                .setMessage("Nothing similar is on the screen. Make sure the game shows the same screen as the screenshot.")
+            else -> b.setTitle("未找到")
+                .setMessage("屏幕上没有相似内容。请确保游戏显示与截图相同的画面。")
                 .setPositiveButton("OK", null)
         }
         b.show()
