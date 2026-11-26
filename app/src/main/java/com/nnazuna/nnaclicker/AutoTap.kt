@@ -51,7 +51,7 @@ object AutoTap {
 
     /** "设置 N" with N one past the highest number in use, so names never repeat after a delete. */
     fun nextSetupName(existing: List<String>): String {
-        val pattern = Regex("""^Setup (\d+)$""")
+        val pattern = Regex("""^(?:Setup|设置) (\d+)$""")
         val used = existing.mapNotNull { pattern.find(it)?.groupValues?.get(1)?.toIntOrNull() }
         return "设置 ${(used.maxOrNull() ?: 0) + 1}"
     }
